@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""
-FakeLens Environment & Project Verification Script
-Verifies Python version, directory structure, and essential packages.
-"""
+# FakeLens environment and project layout verification script
 
 import sys
 from pathlib import Path
@@ -18,10 +15,11 @@ REQUIRED_DIRECTORIES = [
     "backend/evaluation",
     "backend/utils",
     "frontend",
-    "notebooks",
     "configs",
-    "results",
     "tests",
+    "preprocessing",
+    "training",
+    "evaluation",
 ]
 
 CORE_MODULES = [
@@ -38,6 +36,7 @@ CORE_MODULES = [
 ]
 
 
+# Verify Python version compatibility with project requirements
 def check_python_version() -> bool:
     print(f"[1/4] Checking Python version... Current: {sys.version.split()[0]}")
     if sys.version_info < (3, 10):
@@ -47,6 +46,7 @@ def check_python_version() -> bool:
     return True
 
 
+# Verify presence of required project directory structure
 def check_directories() -> bool:
     print("\n[2/4] Verifying project directory layout...")
     root = Path(__file__).resolve().parent.parent
@@ -61,6 +61,7 @@ def check_directories() -> bool:
     return all_present
 
 
+# Test import of core machine learning and vision libraries
 def check_package_imports() -> dict:
     print("\n[3/4] Checking availability of ML and project libraries...")
     installed = {}
@@ -76,6 +77,7 @@ def check_package_imports() -> dict:
     return installed
 
 
+# Detect CUDA GPU acceleration availability
 def check_accelerator() -> None:
     print("\n[4/4] Checking compute accelerator availability...")
     try:
@@ -89,6 +91,7 @@ def check_accelerator() -> None:
         print("  [SKIP] PyTorch not yet installed.")
 
 
+# Run comprehensive environment and directory verification checklist
 def main():
     print("=" * 60)
     print("  FakeLens Project Setup & Environment Verification")

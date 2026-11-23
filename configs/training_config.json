@@ -1,0 +1,143 @@
+{
+  "hardware": {
+    "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU (6GB VRAM)",
+    "cpu": "AMD Ryzen 7 7840HS (8 cores, 16 threads)",
+    "ram_gb": 16,
+    "environment": ".venv-gpu"
+  },
+  "hyperparameters": {
+    "efficientnet_b0": {
+      "optimizer": "AdamW",
+      "learning_rate": 0.0001,
+      "weight_decay": 0.01,
+      "batch_size": 32,
+      "image_size": [
+        224,
+        224
+      ],
+      "normalization": "ImageNet"
+    },
+    "custom_cnn": {
+      "optimizer": "Adam",
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 32,
+      "image_size": [
+        224,
+        224
+      ]
+    },
+    "random_forest": {
+      "n_estimators": 250,
+      "max_depth": 25,
+      "feature_dim": 1798
+    },
+    "mlp": {
+      "hidden_layer_sizes": [
+        256,
+        128,
+        64
+      ],
+      "activation": "relu",
+      "solver": "adam",
+      "feature_dim": 1798
+    },
+    "knn": {
+      "n_neighbors": 5,
+      "weights": "distance",
+      "metric": "euclidean",
+      "feature_dim": 1798
+    }
+  },
+  "reconciled_historical_hyperparameters": {
+    "artifact": {
+      "binary_rf_55k": {
+        "n_estimators": 250,
+        "max_depth": null,
+        "min_samples_leaf": 4,
+        "training_samples": 55000
+      },
+      "binary_mlp_55k": {
+        "hidden_layer_sizes": [
+          512,
+          256
+        ],
+        "alpha": 0.001,
+        "batch_size": 256,
+        "training_samples": 55000
+      },
+      "binary_knn_32k": {
+        "n_neighbors": 9,
+        "weights": "distance",
+        "metric": "euclidean",
+        "training_samples": 32000
+      },
+      "multiclass_rf_32k": {
+        "n_estimators": 250,
+        "max_depth": null,
+        "min_samples_leaf": 4,
+        "training_samples": 32000
+      },
+      "multiclass_mlp_32k": {
+        "hidden_layer_sizes": [
+          512,
+          256
+        ],
+        "alpha": 0.01,
+        "training_samples": 32000
+      },
+      "multiclass_knn_32k": {
+        "n_neighbors": 5,
+        "weights": "uniform",
+        "metric": "minkowski",
+        "training_samples": 32000
+      }
+    },
+    "deepfakeface": {
+      "binary_rf_48k": {
+        "n_estimators": 150,
+        "max_depth": null,
+        "min_samples_leaf": 6,
+        "training_samples": 48000
+      },
+      "binary_mlp_48k": {
+        "hidden_layer_sizes": [
+          256,
+          128,
+          64
+        ],
+        "alpha": 0.01,
+        "batch_size": 256,
+        "training_samples": 48000
+      },
+      "binary_knn_48k": {
+        "n_neighbors": 21,
+        "weights": "uniform",
+        "metric": "euclidean",
+        "training_samples": 48000
+      },
+      "multiclass_rf_48k": {
+        "n_estimators": 250,
+        "max_depth": 28,
+        "min_samples_leaf": 3,
+        "training_samples": 48000
+      },
+      "multiclass_mlp_48k": {
+        "hidden_layer_sizes": [
+          256,
+          128,
+          64
+        ],
+        "alpha": 0.01,
+        "training_samples": 48000
+      },
+      "multiclass_knn_48k": {
+        "n_neighbors": 15,
+        "weights": "distance",
+        "metric": "cosine",
+        "pca": true,
+        "training_samples": 48000
+      }
+    }
+  }
+}

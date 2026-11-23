@@ -1,0 +1,73 @@
+{
+  "deepfakeface": {
+    "name": "DeepFakeFace (DFF)",
+    "description": "Facial forgery detection and attribution dataset with real CelebA/FFHQ and synthetic/manipulated faces.",
+    "versions": {
+      "v4": {
+        "samples_train": 48000,
+        "samples_val": 6000,
+        "samples_test": 6000,
+        "total_samples": 60000,
+        "manifest_train": "datasets/manifests/DeepFakeFace/v4/train_manifest_v4_60k.csv",
+        "manifest_val": "datasets/manifests/DeepFakeFace/v4/val_manifest_v4_60k.csv",
+        "manifest_test": "datasets/manifests/DeepFakeFace/v4/test_manifest_v4_60k.csv"
+      },
+      "v5": {
+        "samples_train": 56000,
+        "samples_val": 7000,
+        "samples_test": 7000,
+        "total_samples": 70000,
+        "manifest_train": "datasets/manifests/DeepFakeFace/v5/train_manifest_v5_70k.csv",
+        "manifest_val": "datasets/manifests/DeepFakeFace/v5/val_manifest_v5_70k.csv",
+        "manifest_test": "datasets/manifests/DeepFakeFace/v5/test_manifest_v5_70k.csv"
+      }
+    },
+    "binary_classes": [
+      "REAL",
+      "FAKE"
+    ],
+    "multiclass_classes": [
+      "REAL",
+      "SYNTHETIC",
+      "INPAINTING",
+      "DEEPFAKE"
+    ],
+    "image_directory": "data/deepfakeface_v3/images"
+  },
+  "artifact": {
+    "name": "ArtiFact (General Images)",
+    "description": "Cross-generator image forgery dataset containing general scenes, objects, animals, and art.",
+    "versions": {
+      "32k": {
+        "samples_train": 24996,
+        "samples_val": 3571,
+        "samples_test": 7143,
+        "total_samples": 35710
+      },
+      "55k": {
+        "samples_train": 45524,
+        "samples_val": 3571,
+        "samples_test": 7143,
+        "total_samples": 56238,
+        "manifest_train_bin": "datasets/manifests/ArtiFact/binary/train_55k.csv",
+        "manifest_train_multi": "datasets/manifests/ArtiFact/multiclass/train_55k.csv",
+        "manifest_val_bin": "datasets/manifests/ArtiFact/binary/val.csv",
+        "manifest_val_multi": "datasets/manifests/ArtiFact/multiclass/val.csv",
+        "manifest_test_bin": "datasets/manifests/ArtiFact/binary/test.csv",
+        "manifest_test_multi": "datasets/manifests/ArtiFact/multiclass/test.csv"
+      }
+    },
+    "binary_classes": [
+      "REAL",
+      "FAKE"
+    ],
+    "multiclass_classes": [
+      "REAL",
+      "GAN",
+      "DIFFUSION",
+      "FLOW",
+      "AUTOREGRESSIVE"
+    ],
+    "image_directory": "experiments/artifact/data/images"
+  }
+}

@@ -29,6 +29,7 @@ MANIFEST
 # Virtual environments
 venv/
 .venv/
+.venv-gpu/
 ENV/
 env/
 
@@ -49,16 +50,43 @@ env/
 models/checkpoints/
 models/weights/
 backend/models/saved/
+trained_models/
 
 # Datasets and large media files
 data/
-datasets/
+datasets/*
+!datasets/manifests/
+tabular dataset/
+FakeLens_Final_Report_Resources/
+.archive*/
+.backup*/
+experiments/
+report_resources_sha256_manifest.txt
+*.npy
+*.npz
 *.zip
 *.tar.gz
 *.tar
 *.mp4
 *.avi
 *.csv.gz
+
+# Image and photo files (Ignore all images across the repo)
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.bmp
+*.gif
+*.tiff
+*.tif
+*.svg
+*.ico
+*.raw
+*.cr2
+*.nef
+*.heic
+*.avif
 
 # Frontend dependencies and builds
 frontend/node_modules/

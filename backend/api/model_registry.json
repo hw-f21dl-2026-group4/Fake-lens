@@ -1,0 +1,846 @@
+{
+  "deepfakeface": {
+    "binary": {
+      "efficientnet_b0": {
+        "id": "efficientnet_b0",
+        "name": "EfficientNet-B0 (Transfer Learning)",
+        "family": "EfficientNet-B0",
+        "type": "neural_efficientnet",
+        "checkpoint_path": "trained_models/DeepFakeFace/binary/efficientnet_b0.pt",
+        "architecture": "torchvision.models.efficientnet_b0",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "FAKE (Manipulated / Synthetic)"
+        ],
+        "input_size": [
+          224,
+          224
+        ],
+        "preprocessing": "RGB -> Resize 224x224 -> ImageNet Normalization",
+        "training_samples": 48000,
+        "validation_samples": 6000,
+        "val_accuracy": 0.9187,
+        "val_macro_f1": 0.9187,
+        "val_roc_auc": 0.9788,
+        "frozen_train_accuracy": 0.9683,
+        "best_epoch": 17,
+        "status": "Completed (20 epochs)",
+        "is_champion": true,
+        "device": "CUDA / GPU",
+        "sha256": "adaf33a3862cfab0bb83d26b6bc2ef198537069e0eeeabc69df54b5b1e2832f9",
+        "file_size_bytes": 48639045,
+        "available": true
+      },
+      "cnn": {
+        "id": "cnn",
+        "name": "Custom CNN (FakeLensSimpleCNN)",
+        "family": "Custom CNN",
+        "type": "neural_custom_cnn",
+        "checkpoint_path": "trained_models/DeepFakeFace/binary/cnn.pt",
+        "architecture": "FakeLensSimpleCNN(num_classes=2)",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "FAKE (Manipulated / Synthetic)"
+        ],
+        "input_size": [
+          224,
+          224
+        ],
+        "preprocessing": "RGB -> Resize 224x224 -> ImageNet Normalization",
+        "training_samples": 48000,
+        "validation_samples": 6000,
+        "val_accuracy": 0.8933,
+        "val_macro_f1": 0.8968,
+        "val_roc_auc": 0.9679,
+        "best_epoch": 12,
+        "status": "Completed",
+        "is_champion": false,
+        "device": "CUDA / GPU",
+        "sha256": "6b44aa8f3d27198d49c742f2a79d26e107660fc54ae209d0c68e8234b634501f",
+        "file_size_bytes": 5104627,
+        "available": true
+      },
+      "random_forest": {
+        "id": "random_forest",
+        "name": "Random Forest (250 Trees)",
+        "family": "Random Forest",
+        "type": "classical_joblib",
+        "checkpoint_path": "trained_models/DeepFakeFace/binary/random_forest.joblib",
+        "architecture": "RandomForestClassifier(n_estimators=250)",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "FAKE (Manipulated / Synthetic)"
+        ],
+        "feature_dim": 1798,
+        "preprocessing": "1,798 Handcrafted Forensic Features",
+        "training_samples": 48000,
+        "validation_samples": 6000,
+        "val_accuracy": 0.8492,
+        "val_macro_f1": 0.849,
+        "status": "Completed",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "80551889ebf86891285563fe53b2c5f1cf4990e35537a90b47b271291bb6d169",
+        "file_size_bytes": 34785608,
+        "available": true
+      },
+      "mlp": {
+        "id": "mlp",
+        "name": "MLP (512-256-128)",
+        "family": "MLP",
+        "type": "classical_pipeline_dict",
+        "checkpoint_path": "trained_models/DeepFakeFace/binary/mlp.joblib",
+        "architecture": "Pipeline(StandardScaler -> MLPClassifier)",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "FAKE (Manipulated / Synthetic)"
+        ],
+        "feature_dim": 1798,
+        "preprocessing": "1,798 Handcrafted Forensic Features -> StandardScaler",
+        "training_samples": 48000,
+        "validation_samples": 6000,
+        "val_accuracy": 0.854,
+        "val_macro_f1": 0.8539,
+        "status": "Completed",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "05ab60fcd9731ce96f18bd28bd59e519baf3fd957d02515c07385e9327d8b50d",
+        "file_size_bytes": 8081562,
+        "available": true
+      },
+      "knn": {
+        "id": "knn",
+        "name": "KNN (K=15 Brute)",
+        "family": "KNN",
+        "type": "classical_pipeline_dict",
+        "checkpoint_path": "trained_models/DeepFakeFace/binary/knn.joblib",
+        "architecture": "Pipeline(StandardScaler -> PCA -> KNeighborsClassifier)",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "FAKE (Manipulated / Synthetic)"
+        ],
+        "feature_dim": 1798,
+        "preprocessing": "1,798 Handcrafted Forensic Features -> StandardScaler -> PCA",
+        "training_samples": 48000,
+        "validation_samples": 6000,
+        "val_accuracy": 0.7925,
+        "val_macro_f1": 0.792,
+        "status": "Completed",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "055c439124980c5cf5e5163f6d9d5d93193b1583ad957720d9d0ec137c45e08b",
+        "file_size_bytes": 11218010,
+        "available": true
+      }
+    },
+    "multiclass": {
+      "efficientnet_b0": {
+        "id": "efficientnet_b0",
+        "name": "EfficientNet-B0 (Transfer Learning - Interrupted)",
+        "family": "EfficientNet-B0",
+        "type": "neural_efficientnet",
+        "checkpoint_path": "trained_models/DeepFakeFace/multiclass/efficientnet_b0.pt",
+        "architecture": "torchvision.models.efficientnet_b0",
+        "num_classes": 4,
+        "class_order": [
+          "wiki",
+          "text2img",
+          "inpainting",
+          "insight"
+        ],
+        "display_labels": [
+          "wiki (REAL)",
+          "text2img (Synthetic)",
+          "inpainting (Edited)",
+          "insight (Face Swap)"
+        ],
+        "input_size": [
+          224,
+          224
+        ],
+        "preprocessing": "RGB -> Resize 224x224 -> ImageNet Normalization",
+        "training_samples": 48000,
+        "validation_samples": 6000,
+        "val_accuracy": 0.8473,
+        "val_macro_f1": 0.842,
+        "val_roc_auc": 0.9752,
+        "best_epoch": 7,
+        "status": "Training stopped after 7 epochs; best completed checkpoint independently verified.",
+        "is_champion": true,
+        "device": "CUDA / GPU",
+        "sha256": "6f122d0263a0fbd1d0ca52dea285c269e6ea3fb80cc438851361971eb6ead494",
+        "file_size_bytes": 48688134,
+        "available": true
+      },
+      "cnn": {
+        "id": "cnn",
+        "name": "Custom CNN Continuation (Phase 6C Champion)",
+        "family": "Custom CNN",
+        "type": "neural_custom_cnn",
+        "checkpoint_path": "trained_models/DeepFakeFace/multiclass/cnn.pt",
+        "architecture": "FakeLensSimpleCNN(num_classes=4)",
+        "num_classes": 4,
+        "class_order": [
+          "wiki",
+          "text2img",
+          "inpainting",
+          "insight"
+        ],
+        "display_labels": [
+          "wiki (REAL)",
+          "text2img (Synthetic)",
+          "inpainting (Edited)",
+          "insight (Face Swap)"
+        ],
+        "input_size": [
+          224,
+          224
+        ],
+        "preprocessing": "RGB -> Resize 224x224 -> ImageNet Normalization",
+        "training_samples": 48000,
+        "validation_samples": 6000,
+        "val_accuracy": 0.8358,
+        "val_macro_f1": 0.791,
+        "val_roc_auc": 0.9615,
+        "best_epoch": 15,
+        "status": "Completed (Phase 6C)",
+        "is_champion": false,
+        "device": "CUDA / GPU",
+        "sha256": "f5e2ac8e43d241a8d7e3256dd04a55972af7a04d83b4b9ebd279a259e2fb045c",
+        "file_size_bytes": 1707033,
+        "available": true
+      },
+      "random_forest": {
+        "id": "random_forest",
+        "name": "Random Forest Multiclass (Refit)",
+        "family": "Random Forest",
+        "type": "classical_pipeline",
+        "checkpoint_path": "trained_models/DeepFakeFace/multiclass/random_forest.joblib",
+        "architecture": "Pipeline(StandardScaler -> RandomForestClassifier)",
+        "num_classes": 4,
+        "class_order": [
+          "wiki",
+          "text2img",
+          "inpainting",
+          "insight"
+        ],
+        "display_labels": [
+          "wiki (REAL)",
+          "text2img (Synthetic)",
+          "inpainting (Edited)",
+          "insight (Face Swap)"
+        ],
+        "feature_dim": 1798,
+        "preprocessing": "1,798 Handcrafted Forensic Features -> StandardScaler",
+        "training_samples": 48000,
+        "validation_samples": 6000,
+        "val_accuracy": 0.768,
+        "val_macro_f1": 0.735,
+        "status": "Completed",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "bdf47483c5e7c629d15abb598723a06389df34882aaefc241925046fb8744b49",
+        "file_size_bytes": 47295761,
+        "available": true
+      },
+      "mlp": {
+        "id": "mlp",
+        "name": "MLP Multiclass (Optimized)",
+        "family": "MLP",
+        "type": "classical_pipeline",
+        "checkpoint_path": "trained_models/DeepFakeFace/multiclass/mlp.joblib",
+        "architecture": "Pipeline(StandardScaler -> MLPClassifier)",
+        "num_classes": 4,
+        "class_order": [
+          "wiki",
+          "text2img",
+          "inpainting",
+          "insight"
+        ],
+        "display_labels": [
+          "wiki (REAL)",
+          "text2img (Synthetic)",
+          "inpainting (Edited)",
+          "insight (Face Swap)"
+        ],
+        "feature_dim": 1798,
+        "preprocessing": "1,798 Handcrafted Forensic Features -> StandardScaler",
+        "training_samples": 48000,
+        "validation_samples": 6000,
+        "val_accuracy": 0.7812,
+        "val_macro_f1": 0.748,
+        "status": "Completed",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "d1f66d15c004b49f5ee8d199cb2156b6e766d8f48314422236ae390eef2b0371",
+        "file_size_bytes": 5571204,
+        "available": true
+      },
+      "knn": {
+        "id": "knn",
+        "name": "KNN Multiclass (Optimized)",
+        "family": "KNN",
+        "type": "classical_pipeline",
+        "checkpoint_path": "trained_models/DeepFakeFace/multiclass/knn.joblib",
+        "architecture": "Pipeline(StandardScaler -> PCA -> KNeighborsClassifier)",
+        "num_classes": 4,
+        "class_order": [
+          "wiki",
+          "text2img",
+          "inpainting",
+          "insight"
+        ],
+        "display_labels": [
+          "wiki (REAL)",
+          "text2img (Synthetic)",
+          "inpainting (Edited)",
+          "insight (Face Swap)"
+        ],
+        "feature_dim": 1798,
+        "preprocessing": "1,798 Handcrafted Forensic Features -> StandardScaler -> PCA",
+        "training_samples": 48000,
+        "validation_samples": 6000,
+        "val_accuracy": 0.715,
+        "val_macro_f1": 0.672,
+        "status": "Completed",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "9d30f1af34d1c2d760a911319b0a899a735efda6aa86cdad4086dbab89fc6427",
+        "file_size_bytes": 27917429,
+        "available": true
+      }
+    }
+  },
+  "artifact": {
+    "binary": {
+      "efficientnet_b0": {
+        "id": "efficientnet_b0",
+        "name": "EfficientNet-B0 (55K Transfer Learning)",
+        "family": "EfficientNet-B0",
+        "type": "neural_efficientnet",
+        "checkpoint_path": "trained_models/ArtiFact/binary/efficientnet_b0.pt",
+        "architecture": "torchvision.models.efficientnet_b0",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "FAKE (AI-Generated / Manipulated)"
+        ],
+        "input_size": [
+          224,
+          224
+        ],
+        "preprocessing": "RGB -> Resize 224x224 -> ImageNet Normalization",
+        "training_samples": 55000,
+        "validation_samples": 4000,
+        "val_accuracy": 0.866,
+        "val_macro_f1": 0.866,
+        "val_roc_auc": 0.9425,
+        "best_epoch": 16,
+        "status": "Completed (20 epochs)",
+        "is_champion": true,
+        "device": "CUDA / GPU",
+        "sha256": "44807a1a358042d4676b1832a9a75b5f156b461394bf96a7154c43fc44d07cf6",
+        "file_size_bytes": 48625321,
+        "available": true
+      },
+      "cnn": {
+        "id": "cnn",
+        "name": "Custom CNN (ArtiFact 55K)",
+        "family": "Custom CNN",
+        "type": "neural_custom_cnn",
+        "checkpoint_path": "trained_models/ArtiFact/binary/cnn.pt",
+        "architecture": "FakeLensSimpleCNN(num_classes=2)",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "FAKE (AI-Generated / Manipulated)"
+        ],
+        "input_size": [
+          224,
+          224
+        ],
+        "preprocessing": "RGB -> Resize 224x224 -> ImageNet Normalization",
+        "training_samples": 55000,
+        "validation_samples": 4000,
+        "val_accuracy": 0.7578,
+        "val_macro_f1": 0.7575,
+        "val_roc_auc": 0.835,
+        "best_epoch": 14,
+        "status": "Completed (20 epochs)",
+        "is_champion": false,
+        "device": "CUDA / GPU",
+        "sha256": "85032a590a111d526bf26882a36b7241b47962528fa4e48ec82b4b86237a4f7f",
+        "file_size_bytes": 5105131,
+        "available": true
+      },
+      "random_forest": {
+        "id": "random_forest",
+        "name": "Random Forest (ArtiFact 55K)",
+        "family": "Random Forest",
+        "type": "classical_direct_rf",
+        "checkpoint_path": "trained_models/ArtiFact/binary/random_forest.joblib",
+        "architecture": "RandomForestClassifier(n_estimators=250)",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "FAKE (AI-Generated / Manipulated)"
+        ],
+        "feature_dim": 1798,
+        "preprocessing": "1,798 Handcrafted Forensic Features",
+        "training_samples": 55000,
+        "validation_samples": 4000,
+        "val_accuracy": 0.723,
+        "val_macro_f1": 0.7228,
+        "status": "Completed",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "4635fd2604c0d457aa50b962ad397d70eb7354c6b315133f94cd8e5e80f2ec22",
+        "file_size_bytes": 36708406,
+        "available": true
+      },
+      "mlp": {
+        "id": "mlp",
+        "name": "MLP (ArtiFact 55K with Scaler)",
+        "family": "MLP",
+        "type": "classical_dict_mlp",
+        "checkpoint_path": "trained_models/ArtiFact/binary/mlp.joblib",
+        "architecture": "MLPClassifier(512-256-128)",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "FAKE (AI-Generated / Manipulated)"
+        ],
+        "feature_dim": 1798,
+        "preprocessing": "1,798 Handcrafted Forensic Features -> StandardScaler",
+        "training_samples": 55000,
+        "validation_samples": 4000,
+        "val_accuracy": 0.7205,
+        "val_macro_f1": 0.7202,
+        "status": "Completed",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "624fc7620214ee6d5cc3a7ace54450e9d9e6d8f6a26093d8ca5531f20ecfe192",
+        "file_size_bytes": 16895111,
+        "available": true
+      },
+      "knn": {
+        "id": "knn",
+        "name": "KNN (ArtiFact 32K Champion)",
+        "family": "KNN",
+        "type": "classical_pipeline",
+        "checkpoint_path": "trained_models/ArtiFact/binary/knn.joblib",
+        "architecture": "Pipeline(StandardScaler -> KNeighborsClassifier(K=15))",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "FAKE (AI-Generated / Manipulated)"
+        ],
+        "feature_dim": 1798,
+        "preprocessing": "1,798 Handcrafted Forensic Features -> StandardScaler",
+        "training_samples": 32000,
+        "validation_samples": 4000,
+        "val_accuracy": 0.6082,
+        "val_macro_f1": 0.608,
+        "status": "Completed (32K Champion)",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "35f4530a2774acd64c416e5c9ba3351fe298d8f0826caffdaa9f2720f643ce28",
+        "file_size_bytes": 230444462,
+        "available": true
+      }
+    },
+    "multiclass": {
+      "efficientnet_b0": {
+        "id": "efficientnet_b0",
+        "name": "EfficientNet-B0 (ArtiFact 55K Multiclass)",
+        "family": "EfficientNet-B0",
+        "type": "neural_efficientnet",
+        "checkpoint_path": "trained_models/ArtiFact/multiclass/efficientnet_b0.pt",
+        "architecture": "torchvision.models.efficientnet_b0",
+        "num_classes": 5,
+        "class_order": [
+          "REAL",
+          "GAN",
+          "DIFFUSION",
+          "INPAINTING",
+          "TRANSFORMER"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "GAN (Synthetic Face/Object)",
+          "DIFFUSION (Stable Diffusion/Midjourney)",
+          "INPAINTING (Neural Inpainting)",
+          "TRANSFORMER (Vision Transformer / StyleGAN)"
+        ],
+        "input_size": [
+          224,
+          224
+        ],
+        "preprocessing": "RGB -> Resize 224x224 -> ImageNet Normalization",
+        "training_samples": 55000,
+        "validation_samples": 4000,
+        "val_accuracy": 0.8255,
+        "val_macro_f1": 0.8256,
+        "val_roc_auc": 0.9728,
+        "frozen_train_accuracy": 0.9736,
+        "best_epoch": 16,
+        "status": "Completed (20 epochs)",
+        "is_champion": true,
+        "device": "CUDA / GPU",
+        "sha256": "57824839b7a7f01b49849e6953d1caa361e235fd3ad3ef89c1e22d6b7bd5e250",
+        "file_size_bytes": 48677981,
+        "available": true
+      },
+      "cnn": {
+        "id": "cnn",
+        "name": "Custom CNN (ArtiFact Multiclass Continuation)",
+        "family": "Custom CNN",
+        "type": "neural_custom_cnn",
+        "checkpoint_path": "trained_models/ArtiFact/multiclass/cnn.pt",
+        "architecture": "FakeLensSimpleCNN(num_classes=5)",
+        "num_classes": 5,
+        "class_order": [
+          "REAL",
+          "GAN",
+          "DIFFUSION",
+          "INPAINTING",
+          "TRANSFORMER"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "GAN (Synthetic Face/Object)",
+          "DIFFUSION (Stable Diffusion/Midjourney)",
+          "INPAINTING (Neural Inpainting)",
+          "TRANSFORMER (Vision Transformer / StyleGAN)"
+        ],
+        "input_size": [
+          224,
+          224
+        ],
+        "preprocessing": "RGB -> Resize 224x224 -> ImageNet Normalization",
+        "training_samples": 40000,
+        "validation_samples": 4000,
+        "val_accuracy": 0.56,
+        "val_macro_f1": 0.5548,
+        "val_roc_auc": 0.8442,
+        "best_epoch": 37,
+        "status": "Completed (Continuation to Ep 40)",
+        "is_champion": false,
+        "device": "CUDA / GPU",
+        "sha256": "a05eb1e09bc6bda51576e55bd756d009a0cedc387b2cd1c5203e0b6e42bb6f47",
+        "file_size_bytes": 5112147,
+        "available": true
+      },
+      "random_forest": {
+        "id": "random_forest",
+        "name": "Random Forest (ArtiFact 40K Multiclass)",
+        "family": "Random Forest",
+        "type": "classical_dict_rf",
+        "checkpoint_path": "trained_models/ArtiFact/multiclass/random_forest.joblib",
+        "architecture": "RandomForestClassifier(n_estimators=250)",
+        "num_classes": 5,
+        "class_order": [
+          "REAL",
+          "GAN",
+          "DIFFUSION",
+          "INPAINTING",
+          "TRANSFORMER"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "GAN (Synthetic Face/Object)",
+          "DIFFUSION (Stable Diffusion/Midjourney)",
+          "INPAINTING (Neural Inpainting)",
+          "TRANSFORMER (Vision Transformer / StyleGAN)"
+        ],
+        "feature_dim": 1798,
+        "preprocessing": "1,798 Handcrafted Forensic Features",
+        "training_samples": 40000,
+        "validation_samples": 4000,
+        "val_accuracy": 0.5258,
+        "val_macro_f1": 0.522,
+        "status": "Completed (40K)",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "b91252e193ae57187358a7abd0a77cdd7d97b1322d98f130c928b2e5609fc8a7",
+        "file_size_bytes": 41611537,
+        "available": true
+      },
+      "mlp": {
+        "id": "mlp",
+        "name": "MLP (ArtiFact 40K Multiclass)",
+        "family": "MLP",
+        "type": "classical_dict_mlp",
+        "checkpoint_path": "trained_models/ArtiFact/multiclass/mlp.joblib",
+        "architecture": "MLPClassifier(512-256-128)",
+        "num_classes": 5,
+        "class_order": [
+          "REAL",
+          "GAN",
+          "DIFFUSION",
+          "INPAINTING",
+          "TRANSFORMER"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "GAN (Synthetic Face/Object)",
+          "DIFFUSION (Stable Diffusion/Midjourney)",
+          "INPAINTING (Neural Inpainting)",
+          "TRANSFORMER (Vision Transformer / StyleGAN)"
+        ],
+        "feature_dim": 1798,
+        "preprocessing": "1,798 Handcrafted Forensic Features -> StandardScaler",
+        "training_samples": 40000,
+        "validation_samples": 4000,
+        "val_accuracy": 0.5327,
+        "val_macro_f1": 0.5285,
+        "status": "Completed (40K)",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "2d8171066fd22ee5c751d5b9989a63fafb43c003efd3e9a0e8be9e4d8de03421",
+        "file_size_bytes": 15506554,
+        "available": true
+      },
+      "knn": {
+        "id": "knn",
+        "name": "KNN (ArtiFact 40K Multiclass)",
+        "family": "KNN",
+        "type": "classical_dict_knn",
+        "checkpoint_path": "trained_models/ArtiFact/multiclass/knn.joblib",
+        "architecture": "KNeighborsClassifier(n_neighbors=15)",
+        "num_classes": 5,
+        "class_order": [
+          "REAL",
+          "GAN",
+          "DIFFUSION",
+          "INPAINTING",
+          "TRANSFORMER"
+        ],
+        "display_labels": [
+          "REAL (Authentic)",
+          "GAN (Synthetic Face/Object)",
+          "DIFFUSION (Stable Diffusion/Midjourney)",
+          "INPAINTING (Neural Inpainting)",
+          "TRANSFORMER (Vision Transformer / StyleGAN)"
+        ],
+        "feature_dim": 1798,
+        "preprocessing": "1,798 Handcrafted Forensic Features -> StandardScaler",
+        "training_samples": 40000,
+        "validation_samples": 4000,
+        "val_accuracy": 0.313,
+        "val_macro_f1": 0.308,
+        "status": "Completed (40K)",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "526c0550470777195a48899880fb8265adc0d7801c19d3539ef74cb49a35a677",
+        "file_size_bytes": 210062847,
+        "available": true
+      }
+    }
+  },
+  "cifake": {
+    "binary": {
+      "cnn": {
+        "id": "cnn",
+        "name": "Custom CNN (Baseline Champion)",
+        "family": "Custom CNN",
+        "type": "cifake_neural_cnn",
+        "checkpoint_path": "trained_models/CIFAKE/binary/cnn.pt",
+        "architecture": "CIFAKECNN (3-Block: 32-64-128 + FC 128)",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic CIFAR-10)",
+          "FAKE (Stable Diffusion v1.4)"
+        ],
+        "input_size": [
+          32,
+          32
+        ],
+        "preprocessing": "RGB -> Resize 32x32 -> Channel Normalization (mean=[0.4719, 0.4630, 0.4183], std=[0.2374, 0.2373, 0.2658])",
+        "training_samples": 79707,
+        "validation_samples": 19619,
+        "test_samples": 20000,
+        "val_accuracy": 0.9718,
+        "test_accuracy": 0.9714,
+        "val_macro_f1": 0.9718,
+        "test_macro_f1": 0.9714,
+        "val_roc_auc": 0.9965,
+        "test_roc_auc": 0.9962,
+        "frozen_train_accuracy": 0.9745,
+        "best_epoch": 30,
+        "status": "Completed (30 epochs)",
+        "is_champion": true,
+        "device": "CUDA / GPU",
+        "sha256": "7b3092fe38976d48387769d9c22fc43b01b3f5b9296cb210539f1267c4100eb9",
+        "file_size_bytes": 4295009,
+        "available": true
+      },
+      "mlp": {
+        "id": "mlp",
+        "name": "Multi-Layer Perceptron (Baseline Champion)",
+        "family": "MLP",
+        "type": "cifake_neural_mlp",
+        "checkpoint_path": "trained_models/CIFAKE/binary/mlp.pt",
+        "architecture": "CIFAKEMLP (3072 -> 1024 -> 512 -> 128 -> 1)",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic CIFAR-10)",
+          "FAKE (Stable Diffusion v1.4)"
+        ],
+        "input_size": [
+          32,
+          32
+        ],
+        "preprocessing": "RGB -> Resize 32x32 -> Channel Normalization -> Flatten 3072",
+        "training_samples": 79707,
+        "validation_samples": 19619,
+        "test_samples": 20000,
+        "val_accuracy": 0.8582,
+        "test_accuracy": 0.8567,
+        "val_macro_f1": 0.8582,
+        "test_macro_f1": 0.8567,
+        "val_roc_auc": 0.9345,
+        "test_roc_auc": 0.9332,
+        "frozen_train_accuracy": 0.8835,
+        "best_epoch": 11,
+        "status": "Completed (15 epochs)",
+        "is_champion": false,
+        "device": "CUDA / GPU",
+        "sha256": "89ae191489963d97c1270fe37efa5a3a1104c43e877daa7f636e6838d2e026ec",
+        "file_size_bytes": 44897279,
+        "available": true
+      },
+      "random_forest": {
+        "id": "random_forest",
+        "name": "Random Forest (300 Trees Regularized)",
+        "family": "Random Forest",
+        "type": "cifake_classical_rf",
+        "checkpoint_path": "trained_models/CIFAKE/binary/random_forest.joblib",
+        "architecture": "RandomForestClassifier (300 Trees, max_depth=35, min_samples_leaf=2)",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic CIFAR-10)",
+          "FAKE (Stable Diffusion v1.4)"
+        ],
+        "input_size": [
+          32,
+          32
+        ],
+        "preprocessing": "RGB -> Resize 32x32 -> Raw Pixels [0, 1] -> Flatten 3072",
+        "training_samples": 79707,
+        "validation_samples": 19619,
+        "test_samples": 20000,
+        "val_accuracy": 0.8371,
+        "test_accuracy": null,
+        "val_macro_f1": 0.8371,
+        "test_macro_f1": null,
+        "val_roc_auc": 0.9149,
+        "test_roc_auc": null,
+        "frozen_train_accuracy": 0.9985,
+        "best_epoch": null,
+        "status": "Completed (300 trees, depth=35, leaf=2)",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "1076ea18e87a28e8b97a63090f4f4b7f20719bf4237643aa559c5fca4c482530",
+        "file_size_bytes": 253409737,
+        "available": true
+      },
+      "knn": {
+        "id": "knn",
+        "name": "K-Nearest Neighbors (K=5 Cosine PCA-100D)",
+        "family": "KNN",
+        "type": "cifake_classical_knn",
+        "checkpoint_path": "trained_models/CIFAKE/binary/knn.joblib",
+        "architecture": "KNeighborsClassifier (K=5, weights=distance, metric=cosine, PCA 100-D)",
+        "num_classes": 2,
+        "class_order": [
+          "REAL",
+          "FAKE"
+        ],
+        "display_labels": [
+          "REAL (Authentic CIFAR-10)",
+          "FAKE (Stable Diffusion v1.4)"
+        ],
+        "input_size": [
+          32,
+          32
+        ],
+        "preprocessing": "RGB -> Resize 32x32 -> Raw Pixels [0, 1] -> Flatten 3072 -> PCA 100-D",
+        "training_samples": 40000,
+        "validation_samples": 19619,
+        "test_samples": 20000,
+        "val_accuracy": 0.7675,
+        "test_accuracy": null,
+        "val_macro_f1": 0.7669,
+        "test_macro_f1": null,
+        "val_roc_auc": 0.8508,
+        "test_roc_auc": null,
+        "frozen_train_accuracy": 1.0,
+        "best_epoch": null,
+        "status": "Completed (K=5, Cosine Distance, 100-D PCA, 40k samples)",
+        "is_champion": false,
+        "device": "CPU",
+        "sha256": "69bbeb5fe8d4befb6e414d50c9ef2718c9e0b93f920d035dcb857f803eaaee0a",
+        "file_size_bytes": 16321189,
+        "available": true
+      }
+    }
+  }
+}
