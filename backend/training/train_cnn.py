@@ -15,7 +15,7 @@ torch.set_num_threads(8)
 from backend.datasets.dff_dataset import get_cnn_dataloader
 from backend.models.cnn_model import FakeLensSimpleCNN
 
-#train the model for one complete pass through the training dataset
+#trains the model for one complete pass through the training dataset
 def train_one_epoch(model, dataloader, criterion, optimizer, device):
     model.train()
     total_loss = 0.0
@@ -50,7 +50,7 @@ def train_one_epoch(model, dataloader, criterion, optimizer, device):
     return epoch_loss, epoch_acc, epoch_prec, epoch_rec, epoch_f1
 
 
-#check the model performance on the selected dataset split
+#checks the models performance on the selected dataset split
 def evaluate_split(model, dataloader, criterion, device):
     model.eval()
     total_loss = 0.0
@@ -88,7 +88,7 @@ def evaluate_split(model, dataloader, criterion, device):
         "targets": all_targets
     }
 
-#manage the complete cnn training process, including validation
+#manages the complete cnn training process, including validation
 def train_cnn():
     print("=" * 65, flush=True)
     print(" FakeLens: Training Binary CNN (FakeLensSimpleCNN) on CPU", flush=True)
@@ -241,7 +241,7 @@ def train_cnn():
     cnn_test_df.to_csv(results_dir / "cnn_evaluation.csv", index=False)
     print(f"Saved evaluation metrics to: {results_dir / 'cnn_evaluation.csv'}", flush=True)
 
-    # Save test predictions for per-generator analysis
+    # Saves thw test predictions for per-generator analysis
     test_manifest_df = pd.read_csv(test_manifest)
     test_manifest_df["cnn_pred"] = test_res["preds"]
     test_manifest_df.to_csv(results_dir / "cnn_test_predictions.csv", index=False)
