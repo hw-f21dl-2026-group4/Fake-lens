@@ -1,6 +1,6 @@
 import json
 
-#store previously recorded model evaluation results in one place
+#stores previously recorded model evaluation results in one place
 VERIFIED_EVALUATION_DATABASE = {
     #general information about the validation
     "benchmark_info": {

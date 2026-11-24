@@ -6,7 +6,7 @@ import joblib
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
 from backend.models.classical_models import get_knn_model, get_random_forest_model, get_mlp_model
 
-#Compare the predicted labels woth the actual labels
+#Compares the predicted labels woth the actual labels
 def evaluate_predictions(y_true, y_pred, model_name: str) -> dict:
     acc = accuracy_score(y_true, y_pred)
     prec = precision_score(y_true, y_pred, average="binary", zero_division=0)
@@ -31,7 +31,7 @@ def evaluate_predictions(y_true, y_pred, model_name: str) -> dict:
         "confusion_matrix": cm.tolist()
     }
 
-#train and compare knn, random forest and mlp using extracvted image features
+#trains and compares knn, random forest and mlp using extracvted image features
 def train_and_eval_classical_models():
     print("=" * 60)
     print(" FakeLens: Training & Evaluating Classical Models (KNN, RF, MLP)")
@@ -42,7 +42,7 @@ def train_and_eval_classical_models():
     models_dir = root / "results" / "models"
     models_dir.mkdir(parents=True, exist_ok=True)
 
-    # 1. Load Caches
+    # 1. Loads Caches
     print("\n[1] Loading precomputed feature matrices...")
     train_npz = np.load(cache_dir / "train_features.npz")
     val_npz = np.load(cache_dir / "val_features.npz")
@@ -63,7 +63,7 @@ def train_and_eval_classical_models():
 
     results = []
 
-    # 2. Train & Tune KNN
+    # 2. Trains & Tunes KNN
     print("\n[2] Training K-Nearest Neighbors (KNN)...")
     t0 = time.time()
     best_k = 5
@@ -90,7 +90,7 @@ def train_and_eval_classical_models():
     res_knn["train_time_sec"] = knn_train_time
     results.append(res_knn)
 
-    # 3. Train & Evaluate Random Forest
+    # 3. Trains & Evaluates Random Forest
     print("\n[3] Training Random Forest (RF)...")
     t0 = time.time()
     rf = get_random_forest_model(n_estimators=150, max_depth=25, random_state=42)
@@ -107,7 +107,7 @@ def train_and_eval_classical_models():
     res_rf["train_time_sec"] = rf_train_time
     results.append(res_rf)
 
-    # 4. Train & Evaluate MLP
+    # 4. Trains & Evaluates MLP
     print("\n[4] Training Multilayer Perceptron (MLP)...")
     t0 = time.time()
     mlp = get_mlp_model(hidden_layer_sizes=(256, 128, 64), max_iter=150, random_state=42)

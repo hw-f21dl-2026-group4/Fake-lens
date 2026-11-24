@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-#define the cnn architecture used to learn visual patterns directly from input images 
+#defines the cnn architecture used to learn visual patterns directly from input images 
 class FakeLensSimpleCNN(nn.Module):
     def __init__(self, num_classes: int = 2, dropout: float = 0.3):
         super().__init__()
@@ -35,7 +35,7 @@ class FakeLensSimpleCNN(nn.Module):
             nn.Linear(128, num_classes)
         )
 
-    #pass the input through the network layers to obtain the final class scores
+    #passes the input through the network layers to obtain the final class scores
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         feat = self.features(x)
         pooled = self.avgpool(feat)

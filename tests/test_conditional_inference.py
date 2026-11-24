@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 from backend.api.inference_engine import engine
 
-# to test real image prediction skips multiclass
+# to test if real image prediction skips multiclass
 print("=== 1. TEST CONDITIONAL INFERENCE WITH REAL PREDICTION ===")
 img_real = Image.new("RGB", (224, 224), color=(200, 150, 120))
 buf1 = io.BytesIO()
@@ -19,7 +19,7 @@ if res_real["binary_result"]["decision"] == "REAL":
     assert res_real["multiclass_result"]["executed"] is False, "Multiclass must be skipped on REAL"
     print("PASS: Multiclass skipped on REAL prediction. Reason:", res_real["multiclass_result"]["reason"])
 
-# to test fake image prediction triggers multiclass
+# to test if fake image prediction triggers multiclass
 print("\n=== 2. TEST CONDITIONAL INFERENCE WITH FAKE PREDICTION ===")
 np.random.seed(42)
 fake_arr = np.random.randint(0, 256, (224, 224, 3), dtype=np.uint8)

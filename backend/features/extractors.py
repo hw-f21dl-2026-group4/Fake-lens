@@ -6,7 +6,7 @@ from PIL import Image
 
 from backend.preprocessing.image_transforms import load_image_array
 
-# measure how the different color are distributed throughtout the image
+# measures how the different colors are distributed throughtout the image
 def extract_color_histogram(img_rgb: np.ndarray, bins_per_channel: int = 32) -> np.ndarray:
     hist_r = cv2.calcHist([img_rgb], [0], None, [bins_per_channel], [0, 256]).flatten()
     hist_g = cv2.calcHist([img_rgb], [1], None, [bins_per_channel], [0, 256]).flatten()
@@ -18,7 +18,7 @@ def extract_color_histogram(img_rgb: np.ndarray, bins_per_channel: int = 32) -> 
 
     return np.concatenate([hist_r, hist_g, hist_b]).astype(np.float32)
 
-#capture local texture patterns by comparing neighbouting pixels
+#captures the local texture patterns by comparing neighbouting pixels
 def extract_lbp_texture(img_rgb: np.ndarray, P: int = 8, R: float = 1.0) -> np.ndarray:
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY)
     lbp = local_binary_pattern(gray, P=P, R=R, method="uniform")
@@ -37,7 +37,7 @@ def extract_fft_frequency(img_rgb: np.ndarray, num_rings: int = 16) -> np.ndarra
 
     log_magnitude = np.log1p(magnitude_spectrum)
 
-    # Create radial distance map from center
+    # Creates a radial distance map from the center
     cy, cx = h // 2, w // 2
     y, x = np.ogrid[:h, :w]
     r = np.sqrt((x - cx) ** 2 + (y - cy) ** 2)
@@ -57,7 +57,7 @@ def extract_fft_frequency(img_rgb: np.ndarray, num_rings: int = 16) -> np.ndarra
 
     return radial_energy.astype(np.float32)
 
-# extract information about the edges andtheir directions within the image
+# extracts information about the edges and their directions within the image
 def extract_hog_edges(img_rgb: np.ndarray) -> np.ndarray:
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY)
     hog_feats = hog(
@@ -71,7 +71,7 @@ def extract_hog_edges(img_rgb: np.ndarray) -> np.ndarray:
     )
     return hog_feats.astype(np.float32)
 
-#combine color,texture,frequency and edge features into a single feature vector
+#combines color,texture,frequency and edge features into a single feature vector
 def extract_all_features(img_path_or_array: str | Path | np.ndarray) -> np.ndarray:
     if isinstance(img_path_or_array, (str, Path)):
         img_rgb = load_image_array(img_path_or_array, target_size=(224, 224))

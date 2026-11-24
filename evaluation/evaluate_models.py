@@ -10,9 +10,9 @@ from sklearn.metrics import (
 )
 
 from backend.api.inference_engine import UnifiedInferenceEngine, REGISTRY_PATH
-# to evaluate a saved model checkpoint on validation or test split
+# To evaluate a saved model checkpoint on validation or test split
 def evaluate_model(dataset: str, task: str, model_id: str, split: str = "val", allow_test: bool = False):
-    # to prevent accidental use of the protected test dataset
+    # To prevent accidental use of the protected test dataset
     if split == "test" and not allow_test:
         raise PermissionError(
             "Access to protected test split is strictly blocked during cleanup. "
@@ -21,14 +21,14 @@ def evaluate_model(dataset: str, task: str, model_id: str, split: str = "val", a
 
     print(f"[FakeLens Evaluator] Initializing evaluation for: {dataset.upper()} | {task.upper()} | {model_id.upper()} | Split: {split.upper()}")
     
-    # to read the model registry for selected model details
+    # To read the model registry for selected model details
     with open(REGISTRY_PATH, "r") as f:
         registry = json.load(f)
 
     model_info = registry[dataset][task][model_id]
     checkpoint_path = model_info["checkpoint_path"]
 
-    # to check if the required model checkpoint is present
+    # To check if the required model checkpoint is present
     if not os.path.exists(checkpoint_path):
         raise FileNotFoundError(f"Model checkpoint not found: {checkpoint_path}")
 

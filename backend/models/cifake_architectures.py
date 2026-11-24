@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-#define a convolutional neural netwokr for cifake image classification
+#defines a convolutional neural netwokr for cifake image classification
 class CIFAKECNN(nn.Module):
-    #conatructor to initialize the layers of the cnn architecture
+    #constructor to initialize the layers of the cnn architecture
     def __init__(self, dropout_rate: float = 0.4):
         super(CIFAKECNN, self).__init__()
 
@@ -26,7 +26,7 @@ class CIFAKECNN(nn.Module):
         self.dropout = nn.Dropout(dropout_rate)
         self.fc_out = nn.Linear(128, 1)
 
-    #process the image through the convolutional and classification layer
+    #processes the image through the convolutional and classification layer
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.pool1(F.relu(self.bn1(self.conv1(x))))
         x = self.pool2(F.relu(self.bn2(self.conv2(x))))
@@ -37,7 +37,7 @@ class CIFAKECNN(nn.Module):
         return x.squeeze(-1)
 
 
-# define a mlp that uses flattened image pixels instead of convolution layers
+# defines a mlp that uses flattened image pixels instead of convolution layers
 class CIFAKEMLP(nn.Module):
     def __init__(self, input_dim: int = 3072, dropout_rate: float = 0.3):
         super(CIFAKEMLP, self).__init__()
@@ -56,7 +56,7 @@ class CIFAKEMLP(nn.Module):
 
         self.fc_out = nn.Linear(64, 1)
 
-    # pass the flattened pixel values thrigh the fully connected layeres
+    # passes the flattened pixel values thrigh the fully connected layeres
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if x.dim() > 2:
             x = x.view(x.size(0), -1)

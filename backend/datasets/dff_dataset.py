@@ -22,9 +22,9 @@ BINARY_LABEL_MAP = {"REAL": 0, "FAKE": 1}
 SOURCE_CLASS_MAP = {"wiki": 0, "text2img": 1, "inpainting": 2, "insight": 3}
 SOURCE_CLASS_NAMES = ["wiki", "text2img", "inpainting", "insight"]
 
-# create a custom dataset for loading deepfakeface images and their labels
+# creates a custom dataset for loading deepfakeface images and their labels
 class DeepFakeFaceDataset(Dataset):
-    #read the dataset manifest and prepare the selected dataset split
+    #reads the dataset manifest and prepare the selected dataset split
     def __init__(self, manifest_csv: str | Path, root_dir: str | Path = ".", split: str = "train", transform=None):
         if not TORCH_AVAILABLE:
             raise RuntimeError("PyTorch is required to instantiate DeepFakeFaceDataset.")
@@ -38,11 +38,11 @@ class DeepFakeFaceDataset(Dataset):
         else:
             self.transform = get_cnn_transforms(split=self.split)
 
-    #return the total number of samples available in the dataset 
+    #returns the total number of samples available in the dataset 
     def __len__(self) -> int:
         return len(self.df)
 
-    #load one image alone with its corresponding dataset information
+    #loads one image alone with its corresponding dataset information
     def __getitem__(self, idx: int) -> dict:
         row = self.df.iloc[idx]
         img_rel_path = row["local_path"]
@@ -65,7 +65,7 @@ class DeepFakeFaceDataset(Dataset):
         }
 
 
-#create batches of images so the cnn can process them efficiently
+#creates batches of images so the cnn can process them efficiently
 def get_cnn_dataloader(manifest_csv: str | Path,
                        root_dir: str | Path = ".",
                        split: str = "train",

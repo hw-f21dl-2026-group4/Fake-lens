@@ -7,7 +7,7 @@ from scipy.stats import skew, kurtosis
 from backend.preprocessing.image_transforms import load_image_array
 from backend.features.extractors import extract_all_features
 
-# Examine detailed texture patterns and changes in pixel intensity.
+# Examines detailed texture patterns and changes in pixel intensity.
 # These measurements provide additional information about image structure.
 def extract_texture_gradient_extended(img_rgb: np.ndarray) -> np.ndarray:
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY)
@@ -33,7 +33,7 @@ def extract_texture_gradient_extended(img_rgb: np.ndarray) -> np.ndarray:
 
     return np.concatenate([hist16.astype(np.float32), lap_stats, sobel_stats])
 
-# Measure how image energy is distributed across different frequency regions.
+# Measures how the image energy is distributed across different frequency regions.
 def extract_frequency_energy_extended(img_rgb: np.ndarray) -> np.ndarray:
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
     h, w = gray.shape
@@ -78,7 +78,7 @@ def extract_frequency_energy_extended(img_rgb: np.ndarray) -> np.ndarray:
 
     return np.concatenate([radial_energy, quadrants, ratios])
 
-# Study colour relationships and variations using different colour spaces
+# Studies the colour relationships and variations using different colour spaces
 def extract_color_extended(img_rgb: np.ndarray) -> np.ndarray:
     r = img_rgb[:, :, 0].ravel().astype(np.float32)
     g = img_rgb[:, :, 1].ravel().astype(np.float32)
@@ -110,7 +110,7 @@ def extract_color_extended(img_rgb: np.ndarray) -> np.ndarray:
 
     return np.concatenate([rgb_corr, hsv_stats, ycrcb_stats, color_dyn])
 
-# Measure image noise and sharpness to capture possible irregularities
+# Measures the image noise and sharpness to capture possible irregularities
 def extract_noise_sharpness_extended(img_rgb: np.ndarray) -> np.ndarray:
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
     h, w = gray.shape
@@ -158,7 +158,7 @@ def extract_noise_sharpness_extended(img_rgb: np.ndarray) -> np.ndarray:
 
     return np.concatenate([noise_stats, ten_stats, q_noise, res_rings])
 
-# Compare different regions of the image to check whether
+# Compares different regions of the image to check whether
 def extract_spatial_consistency_extended(img_rgb: np.ndarray) -> np.ndarray:
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
     h, w = gray.shape
@@ -209,7 +209,7 @@ def extract_spatial_consistency_extended(img_rgb: np.ndarray) -> np.ndarray:
 
     return np.concatenate([cp_stats, ul_stats])
 
-# Bring together the additional forensic measurements into one feature vector
+# Brings together the additional forensic measurements into one feature vector
 def extract_extended_forensic_features(img_path_or_array: str | Path | np.ndarray) -> np.ndarray:
     if isinstance(img_path_or_array, (str, Path)):
         img_rgb = load_image_array(img_path_or_array, target_size=(224, 224))
