@@ -227,7 +227,7 @@ In accordance with academic repository guidelines and storage constraints:
 
 ## 8. Authors & Academic Integrity
 
-- **Institution**: Heriot-Watt University, School of Mathematical and Computer Sciences
+- **Institution**: Heriot-Watt University Dubai, School of Mathematical and Computer Sciences
 - **Course**: F21DL Data Mining and Machine Learning (2025/2026)
 - **Group**: Group 4
-- **Licence**: Academic research and educational use.
+- **Licence**: Academic Research and Educational Use.
