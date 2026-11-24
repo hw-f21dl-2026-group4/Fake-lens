@@ -1,5 +1,4 @@
-# FakeLens — Multi-Domain Image Forgery Detection & Attribution Platform
-# Main execution for the CLI entry point for training, evaluation, preprocessing, and server execution
+# main entry point for cli execution
 
 import os
 import sys
@@ -9,33 +8,16 @@ import argparse
 # to parse command-line arguments and route subcommands
 def main():
     parser = argparse.ArgumentParser(
-        description="FakeLens: Multi-Domain AI Image Forgery Detection & Attribution",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  # Launch the web application server
-  python main.py serve --port 8000
-
-  # Evaluate a frozen model on the validation split
-  python main.py evaluate --dataset deepfakeface --task binary --model efficientnet_b0 --split val
-  python main.py evaluate --dataset artifact --task multiclass --model cnn --split val
-
-  # Inspect or dry-run training configuration
-  python main.py train --dataset deepfakeface --task binary --model cnn --dry_run
-  python main.py train --dataset artifact --task multiclass --model efficientnet_b0 --dry_run
-
-  # Extract 1,798-dim handcrafted features from an image
-  python main.py preprocess --image path/to/image.jpg
-        """
+        description="FakeLens: Multi-Domain AI Image Forgery Detection & Attribution"
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
 
-    # 1. Server Subcommand
+    # server subcommand
     serve_parser = subparsers.add_parser("serve", help="Run the FakeLens web application server")
     serve_parser.add_argument("--port", type=int, default=8000, help="Port to bind server (default: 8000)")
 
-    # 2. Evaluate Subcommand
+    # evaluate subcommand
     eval_parser = subparsers.add_parser("evaluate", help="Evaluate a model checkpoint")
     eval_parser.add_argument("--dataset", type=str, choices=["deepfakeface", "artifact", "cifake"], required=True)
     eval_parser.add_argument("--task", type=str, choices=["binary", "multiclass"], required=True)
@@ -43,7 +25,7 @@ Examples:
     eval_parser.add_argument("--split", type=str, choices=["val", "test"], default="val")
     eval_parser.add_argument("--allow_test_split", action="store_true", help="Explicit authorization for protected test set")
 
-    # 3. Train Subcommand
+    # train subcommand
     train_parser = subparsers.add_parser("train", help="Inspect or train a model family")
     train_parser.add_argument("--dataset", type=str, choices=["deepfakeface", "artifact", "cifake"], required=True)
     train_parser.add_argument("--task", type=str, choices=["binary", "multiclass"], required=True)
@@ -51,7 +33,7 @@ Examples:
     train_parser.add_argument("--dry_run", action="store_true", help="Validate setup without gradient updates")
     train_parser.add_argument("--epochs", type=int, default=20)
 
-    # 4. Preprocess Subcommand
+    # preprocess subcommand
     prep_parser = subparsers.add_parser("preprocess", help="Run image or tabular preprocessing")
     prep_parser.add_argument("--image", type=str, required=True, help="Path to input image")
 
