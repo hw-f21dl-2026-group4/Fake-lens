@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Any
 import pandas as pd
 from PIL import Image
 
@@ -9,8 +9,11 @@ try:
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
-    Dataset = object
-    DataLoader = object
+    class Dataset:
+        pass
+    class DataLoader:
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            pass
 
 from backend.preprocessing.image_transforms import get_cnn_transforms, load_image_rgb
 
