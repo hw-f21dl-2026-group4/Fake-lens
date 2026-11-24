@@ -57,6 +57,8 @@ def extract_frequency_energy_extended(img_rgb: np.ndarray) -> np.ndarray:
     norm_r = np.linalg.norm(radial_energy)
     if norm_r > 0:
         radial_energy /= norm_r
+    q1 = np.mean(log_mag[:cy, :cx])
+    q2 = np.mean(log_mag[:cy, cx:])
     q3 = np.mean(log_mag[cy:, :cx])
     q4 = np.mean(log_mag[cy:, cx:])
     quadrants = np.array([q1, q2, q3, q4], dtype=np.float32)

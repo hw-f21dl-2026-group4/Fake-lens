@@ -1,3 +1,5 @@
+# test inference across all four model families
+
 import io
 from PIL import Image
 from backend.api.inference_engine import engine
@@ -5,12 +7,13 @@ from backend.api.inference_engine import engine
 print("Engine ready:", engine.is_ready)
 assert engine.is_ready, "Engine must be ready"
 
-# Create synthetic test image
+# generate test sample image
 img = Image.new("RGB", (224, 224), color=(140, 100, 80))
 buf = io.BytesIO()
 img.save(buf, format="JPEG")
 img_bytes = buf.getvalue()
 
+# run inference across each family
 for family in ["CNN", "KNN", "Random Forest", "MLP"]:
     res = engine.analyze_image_bytes(img_bytes, model_family=family)
     bin_res = res["binary_result"]
