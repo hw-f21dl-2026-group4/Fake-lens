@@ -1,13 +1,3 @@
-"""
-Unified Model Evaluation Script for FakeLens.
-Evaluates saved frozen checkpoints on validation splits for:
-- Both datasets: DeepFakeFace & ArtiFact
-- Both tasks: Binary & Multiclass
-- All five model families: EfficientNet-B0, Custom CNN, Random Forest, MLP, KNN
-Computes Accuracy, Precision, Recall, Macro F1, ROC-AUC, and Confusion Matrix.
-Protected test splits require explicit --allow_test_split authorization flag.
-"""
-
 import os
 import json
 import argparse
@@ -20,13 +10,9 @@ from sklearn.metrics import (
 )
 
 from backend.api.inference_engine import UnifiedInferenceEngine, REGISTRY_PATH
-
-
+#prepare a saved model checkpoints for evaluation and display its recorded experimental information
 def evaluate_model(dataset: str, task: str, model_id: str, split: str = "val", allow_test: bool = False):
-    """
-    Evaluates an operational model checkpoint on the specified dataset split.
-    Guards protected test splits unless explicitly enabled.
-    """
+    #prevent accidental use of the protected test dataset 
     if split == "test" and not allow_test:
         raise PermissionError(
             "Access to protected test split is strictly blocked during cleanup. "
@@ -34,13 +20,15 @@ def evaluate_model(dataset: str, task: str, model_id: str, split: str = "val", a
         )
 
     print(f"[FakeLens Evaluator] Initializing evaluation for: {dataset.upper()} | {task.upper()} | {model_id.upper()} | Split: {split.upper()}")
-
+    
+    #read the model registry to find the selected model details
     with open(REGISTRY_PATH, "r") as f:
         registry = json.load(f)
 
     model_info = registry[dataset][task][model_id]
     checkpoint_path = model_info["checkpoint_path"]
 
+    #stop the process of the required model checkpoint is missing
     if not os.path.exists(checkpoint_path):
         raise FileNotFoundError(f"Model checkpoint not found: {checkpoint_path}")
 

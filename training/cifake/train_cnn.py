@@ -1,8 +1,3 @@
-"""
-CIFAKE Binary Image Classification Project
-Step 3: CNN Baseline Training Pipeline
-"""
-
 import sys
 import time
 import json
@@ -13,7 +8,6 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm
 
-# Add project root to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from configs.config import (
     MODELS_DIR,
@@ -25,7 +19,7 @@ from src.data_loader import get_pytorch_dataloaders
 from src.validation import set_seed
 
 
-# Train baseline CNN classifier on CIFAKE training images
+#Train the baeline cnn to distingusih real and ai generated cifake images
 def train_cnn_baseline(
     max_epochs: int = 30,
     batch_size: int = 128,
@@ -41,7 +35,6 @@ def train_cnn_baseline(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Execution Device: {device} (PyTorch {torch.__version__})")
 
-    # Load DataLoaders (Train and Val only, Test set remains locked)
     train_loader, val_loader, _ = get_pytorch_dataloaders(
         batch_size=batch_size,
         augment_train=augment_train,
@@ -137,7 +130,6 @@ def train_cnn_baseline(
             "epoch_time_sec": round(epoch_time, 2),
         })
 
-        # Save Best Validation Checkpoint
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             best_val_acc = val_acc
@@ -165,7 +157,6 @@ def train_cnn_baseline(
     print(f"\nCNN Training Finished in {total_training_time:.1f}s.")
     print(f"Best Validation Epoch: {best_epoch} (Loss: {best_val_loss:.4f}, Acc: {best_val_acc*100:.2f}%)")
 
-    # Save training history
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
     df_history = pd.DataFrame(history)
     df_history.to_csv(TABLES_DIR / "cnn_training_history.csv", index=False)

@@ -1,32 +1,3 @@
-"""
-Phase 5F: Versioned Extended Handcrafted Image-Forensic Feature Extractor.
-Preserves original extract_all_features() baseline (1,690 dims) and appends 108 forensic dims.
-Total extended dimension: 1,690 + 108 = 1,798 dimensions.
-
-Extended Groups:
-- Texture & Gradient Dynamics (24 dims):
-    * Multi-radius LBP (P=16, R=2.0 uniform -> 18 bins)
-    * Laplacian response variance & kurtosis (2 dims)
-    * Sobel gradient magnitude mean, std, skew, 95th-percentile (4 dims)
-- Frequency Energy Distribution (16 dims):
-    * Radial frequency ring energy (8 rings)
-    * Spectral anisotropy across 4 quadrants (4 dims)
-    * High-frequency to low-frequency energy ratios (4 dims)
-- Color & Channel Statistics (24 dims):
-    * RGB channel pairwise correlations (R-G, R-B, G-B -> 3 dims)
-    * HSV channel moments (mean, std for H, S, V -> 6 dims)
-    * YCrCb chrominance moments (mean, std, skew for Cr, Cb -> 6 dims)
-    * Global color contrast / saturation dynamics (9 dims)
-- Noise Residual & Edge Sharpness (20 dims):
-    * High-pass / Wiener noise residual variance & kurtosis (4 dims)
-    * Tenengrad gradient sharpness index (4 dims)
-    * Regional noise variance across 4 image quadrants (4 dims)
-    * High-frequency residual energy statistics (8 dims)
-- Spatial Consistency & Center-Periphery Asymmetry (24 dims):
-    * Center vs Peripheral face-region luminance & texture contrast (12 dims)
-    * Upper vs Lower face-region texture and color balance (12 dims)
-"""
-
 from pathlib import Path
 import numpy as np
 import cv2
@@ -36,26 +7,20 @@ from scipy.stats import skew, kurtosis
 from backend.preprocessing.image_transforms import load_image_array
 from backend.features.extractors import extract_all_features
 
-
+# Examine detailed texture patterns and changes in pixel intensity.
+# These measurements provide additional information about image structure.
 def extract_texture_gradient_extended(img_rgb: np.ndarray) -> np.ndarray:
-    """
-    Computes multi-radius LBP (P=16, R=2) and spatial gradient statistics.
-    Returns: 18 (LBP) + 2 (Laplacian stats) + 4 (Sobel stats) = 24 dimensions.
-    """
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY)
 
-    # 1. Multi-radius LBP (P=16, R=2.0 uniform -> 18 bins)
     lbp16 = local_binary_pattern(gray, P=16, R=2.0, method="uniform")
     n_bins = int(lbp16.max() + 1)
     hist16, _ = np.histogram(lbp16.ravel(), bins=18, range=(0, 18), density=True)
 
-    # 2. Laplacian response statistics
     lap = cv2.Laplacian(gray, cv2.CV_32F)
     lap_var = np.var(lap)
     lap_kurt = kurtosis(lap.ravel(), fisher=True)
     lap_stats = np.array([np.log1p(max(0.0, lap_var)), lap_kurt], dtype=np.float32)
 
-    # 3. Sobel gradient magnitude statistics
     sobelx = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
     sobely = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
     grad_mag = np.sqrt(sobelx ** 2 + sobely ** 2)
@@ -68,12 +33,8 @@ def extract_texture_gradient_extended(img_rgb: np.ndarray) -> np.ndarray:
 
     return np.concatenate([hist16.astype(np.float32), lap_stats, sobel_stats])
 
-
+# Measure how image energy is distributed across different frequency regions.
 def extract_frequency_energy_extended(img_rgb: np.ndarray) -> np.ndarray:
-    """
-    Computes fine-grained radial spectral ratios and 2D quadrant anisotropy.
-    Returns: 8 (radial rings) + 4 (quadrant anisotropy) + 4 (energy ratios) = 16 dimensions.
-    """
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
     h, w = gray.shape
     cy, cx = h // 2, w // 2
@@ -83,12 +44,10 @@ def extract_frequency_energy_extended(img_rgb: np.ndarray) -> np.ndarray:
     mag = np.abs(fshift)
     log_mag = np.log1p(mag)
 
-    # Radial distances
     y, x = np.ogrid[:h, :w]
     r = np.sqrt((x - cx) ** 2 + (y - cy) ** 2)
     max_r = np.sqrt(cx ** 2 + cy ** 2)
 
-    # 1. 8 Radial frequency rings
     ring_bins = np.linspace(0, max_r, 9)
     radial_energy = np.zeros(8, dtype=np.float32)
     for i in range(8):
@@ -98,10 +57,6 @@ def extract_frequency_energy_extended(img_rgb: np.ndarray) -> np.ndarray:
     norm_r = np.linalg.norm(radial_energy)
     if norm_r > 0:
         radial_energy /= norm_r
-
-    # 2. Quadrant spectral energy (Top-Left, Top-Right, Bottom-Left, Bottom-Right)
-    q1 = np.mean(log_mag[:cy, :cx])
-    q2 = np.mean(log_mag[:cy, cx:])
     q3 = np.mean(log_mag[cy:, :cx])
     q4 = np.mean(log_mag[cy:, cx:])
     quadrants = np.array([q1, q2, q3, q4], dtype=np.float32)
@@ -109,7 +64,6 @@ def extract_frequency_energy_extended(img_rgb: np.ndarray) -> np.ndarray:
     if norm_q > 0:
         quadrants /= norm_q
 
-    # 3. Energy ratios: Low vs High, Mid vs High, High fraction, Total energy
     low_e = np.mean(log_mag[r < max_r * 0.25])
     mid_e = np.mean(log_mag[(r >= max_r * 0.25) & (r < max_r * 0.6)])
     high_e = np.mean(log_mag[r >= max_r * 0.6])
@@ -122,30 +76,22 @@ def extract_frequency_energy_extended(img_rgb: np.ndarray) -> np.ndarray:
 
     return np.concatenate([radial_energy, quadrants, ratios])
 
-
+# Study colour relationships and variations using different colour spaces
 def extract_color_extended(img_rgb: np.ndarray) -> np.ndarray:
-    """
-    Computes cross-channel correlation, HSV moments, and YCrCb chrominance statistics.
-    Returns: 3 (RGB corr) + 6 (HSV moments) + 6 (YCrCb moments) + 9 (color dynamics) = 24 dimensions.
-    """
     r = img_rgb[:, :, 0].ravel().astype(np.float32)
     g = img_rgb[:, :, 1].ravel().astype(np.float32)
     b = img_rgb[:, :, 2].ravel().astype(np.float32)
-
-    # 1. RGB pairwise correlations
     rg = np.corrcoef(r, g)[0, 1]
     rb = np.corrcoef(r, b)[0, 1]
     gb = np.corrcoef(g, b)[0, 1]
     rgb_corr = np.nan_to_num(np.array([rg, rb, gb], dtype=np.float32), nan=0.0)
 
-    # 2. HSV moments
     hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV).astype(np.float32)
     h_m, h_s = np.mean(hsv[:, :, 0]) / 180.0, np.std(hsv[:, :, 0]) / 180.0
     s_m, s_s = np.mean(hsv[:, :, 1]) / 255.0, np.std(hsv[:, :, 1]) / 255.0
     v_m, v_s = np.mean(hsv[:, :, 2]) / 255.0, np.std(hsv[:, :, 2]) / 255.0
     hsv_stats = np.array([h_m, h_s, s_m, s_s, v_m, v_s], dtype=np.float32)
 
-    # 3. YCrCb moments
     ycrcb = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2YCrCb).astype(np.float32)
     cr = ycrcb[:, :, 1].ravel()
     cb = ycrcb[:, :, 2].ravel()
@@ -153,7 +99,6 @@ def extract_color_extended(img_rgb: np.ndarray) -> np.ndarray:
     cb_m, cb_s, cb_sk = np.mean(cb) / 255.0, np.std(cb) / 255.0, skew(cb)
     ycrcb_stats = np.nan_to_num(np.array([cr_m, cr_s, cr_sk, cb_m, cb_s, cb_sk], dtype=np.float32), nan=0.0)
 
-    # 4. Color dynamics (channel stds, max-min contrasts, skewness)
     r_std, g_std, b_std = np.std(r) / 255.0, np.std(g) / 255.0, np.std(b) / 255.0
     r_sk, g_sk, b_sk = skew(r), skew(g), skew(b)
     diff_rg = np.mean(np.abs(r - g)) / 255.0
@@ -163,16 +108,11 @@ def extract_color_extended(img_rgb: np.ndarray) -> np.ndarray:
 
     return np.concatenate([rgb_corr, hsv_stats, ycrcb_stats, color_dyn])
 
-
+# Measure image noise and sharpness to capture possible irregularities
 def extract_noise_sharpness_extended(img_rgb: np.ndarray) -> np.ndarray:
-    """
-    Extracts high-frequency noise residual and local edge sharpness metrics.
-    Returns: 4 (noise residual stats) + 4 (Tenengrad sharpness) + 4 (quadrant noise) + 8 (residual spectrum) = 20 dimensions.
-    """
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
     h, w = gray.shape
 
-    # High-pass filter noise extraction (Gaussian blur subtraction)
     blurred = cv2.GaussianBlur(gray, (5, 5), 1.0)
     noise_res = gray - blurred
 
@@ -182,7 +122,6 @@ def extract_noise_sharpness_extended(img_rgb: np.ndarray) -> np.ndarray:
     n_max = np.max(np.abs(noise_res))
     noise_stats = np.nan_to_num(np.array([np.log1p(n_var), n_kurt, n_mean / 255.0, n_max / 255.0], dtype=np.float32), nan=0.0)
 
-    # Tenengrad sharpness index
     gx = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
     gy = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
     ten_sq = gx ** 2 + gy ** 2
@@ -192,7 +131,6 @@ def extract_noise_sharpness_extended(img_rgb: np.ndarray) -> np.ndarray:
     t_p99 = np.percentile(ten_sq, 99)
     ten_stats = np.nan_to_num(np.array([np.log1p(t_mean), np.log1p(t_std), np.log1p(t_p90), np.log1p(t_p99)], dtype=np.float32), nan=0.0)
 
-    # Quadrant noise variance consistency
     cy, cx = h // 2, w // 2
     nv1 = np.var(noise_res[:cy, :cx])
     nv2 = np.var(noise_res[:cy, cx:])
@@ -218,19 +156,11 @@ def extract_noise_sharpness_extended(img_rgb: np.ndarray) -> np.ndarray:
 
     return np.concatenate([noise_stats, ten_stats, q_noise, res_rings])
 
-
+# Compare different regions of the image to check whether
 def extract_spatial_consistency_extended(img_rgb: np.ndarray) -> np.ndarray:
-    """
-    Computes spatial asymmetry: Center (face region) vs Peripheral (background)
-    and Upper (eyes/forehead) vs Lower (mouth/chin).
-    Returns: 12 (center-periphery) + 12 (upper-lower) = 24 dimensions.
-    """
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
     h, w = gray.shape
 
-    # Fixed coordinate regions for 224x224 normalized face:
-    # Center face: 25% to 75% height, 25% to 75% width
-    # Periphery: everything outside center
     y1, y2 = int(0.25 * h), int(0.75 * h)
     x1, x2 = int(0.25 * w), int(0.75 * w)
 
@@ -239,7 +169,6 @@ def extract_spatial_consistency_extended(img_rgb: np.ndarray) -> np.ndarray:
     mask_periphery[y1:y2, x1:x2] = False
     periphery = gray[mask_periphery]
 
-    # Center vs periphery stats
     c_mean, c_std = np.mean(center) / 255.0, np.std(center) / 255.0
     p_mean, p_std = np.mean(periphery) / 255.0, np.std(periphery) / 255.0
     diff_mean = (c_mean - p_mean)
@@ -249,7 +178,6 @@ def extract_spatial_consistency_extended(img_rgb: np.ndarray) -> np.ndarray:
     p_lap = np.var(cv2.Laplacian(gray, cv2.CV_32F)[mask_periphery])
     lap_ratio = np.log1p(c_lap) / (np.log1p(p_lap) + 1e-6)
 
-    # Color differences center vs periphery
     c_rgb = img_rgb[y1:y2, x1:x2].reshape(-1, 3).astype(np.float32) / 255.0
     p_rgb = img_rgb[mask_periphery].reshape(-1, 3).astype(np.float32) / 255.0
     c_rgb_m = np.mean(c_rgb, axis=0)
@@ -258,7 +186,6 @@ def extract_spatial_consistency_extended(img_rgb: np.ndarray) -> np.ndarray:
     norm_c_diff = np.linalg.norm(c_rgb_diff)
     cp_stats = np.array([c_mean, c_std, p_mean, p_std, diff_mean, diff_std, lap_ratio, c_rgb_diff[0], c_rgb_diff[1], c_rgb_diff[2], norm_c_diff, np.log1p(c_lap)], dtype=np.float32)
 
-    # Upper vs Lower stats
     upper = gray[:h//2, :]
     lower = gray[h//2:, :]
     u_mean, u_std = np.mean(upper) / 255.0, np.std(upper) / 255.0
@@ -280,17 +207,8 @@ def extract_spatial_consistency_extended(img_rgb: np.ndarray) -> np.ndarray:
 
     return np.concatenate([cp_stats, ul_stats])
 
-
+# Bring together the additional forensic measurements into one feature vector
 def extract_extended_forensic_features(img_path_or_array: str | Path | np.ndarray) -> np.ndarray:
-    """
-    Extracts the 108 extended image-forensic features:
-    - Texture & Gradient (24)
-    - Frequency Energy (16)
-    - Color Dynamics (24)
-    - Noise & Sharpness (20)
-    - Spatial Consistency (24)
-    Total = 108 dimensions.
-    """
     if isinstance(img_path_or_array, (str, Path)):
         img_rgb = load_image_array(img_path_or_array, target_size=(224, 224))
     else:
@@ -305,12 +223,9 @@ def extract_extended_forensic_features(img_path_or_array: str | Path | np.ndarra
     ext_vector = np.concatenate([f_text, f_freq, f_col, f_noise, f_spat]).astype(np.float32)
     return ext_vector
 
-
+# Extract both the original and extended features from the same image.
+# Return them separately for further processing
 def extract_full_combined_features(img_path_or_array: str | Path | np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Extracts both baseline (1,690) and extended (1,798) representations in a single image read.
-    Returns: (baseline_1690, extended_1798)
-    """
     if isinstance(img_path_or_array, (str, Path)):
         img_rgb = load_image_array(img_path_or_array, target_size=(224, 224))
     else:

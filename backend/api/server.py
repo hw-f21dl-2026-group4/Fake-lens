@@ -1,16 +1,6 @@
-"""
-FakeLens Production Web Server & REST API.
-Built using Python's native http.server with multi-threaded concurrent request handling.
-Zero third-party web framework dependencies required.
-Serves:
-- REST API (/api/health, /api/models, /api/analyze, /api/benchmarks, /api/metrics)
-- Full SPA Frontend static assets (/index.html, /app.js, /styles.css)
-"""
-
 import os
 import sys
 
-# Ensure repository root is always in sys.path even when script is run directly
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
@@ -23,10 +13,9 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from socketserver import ThreadingMixIn
 from urllib.parse import urlparse, parse_qs
 
-# Lazy import engine to keep startup fast and avoid blocking when serving benchmarks
 _engine_instance = None
 
-# Retrieve singleton inference engine instance
+#get the inference engine required to process predicition request
 def get_engine():
     global _engine_instance
     if _engine_instance is None:
@@ -37,7 +26,6 @@ def get_engine():
 PORT = 8000
 FRONTEND_DIR = os.path.abspath("frontend")
 
-# Load central registry
 REGISTRY_PATH = os.path.join(os.path.dirname(__file__), "model_registry.json")
 try:
     with open(REGISTRY_PATH, "r") as f:
@@ -45,12 +33,12 @@ try:
 except Exception:
     MODEL_REGISTRY = {}
 
-
+#allow the server to handle more than one request at a time
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Handle requests concurrently in separate threads."""
     daemon_threads = True
 
-
+#handle request coming from the frontend and send suitable responses
 class FakeLensRequestHandler(SimpleHTTPRequestHandler):
     """
     HTTP handler serving API endpoints and frontend assets.
@@ -58,7 +46,7 @@ class FakeLensRequestHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=FRONTEND_DIR, **kwargs)
 
-    # Set standard JSON headers with CORS support
+    # Set the response headders
     def _set_json_headers(self, status=HTTPStatus.OK):
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -67,11 +55,11 @@ class FakeLensRequestHandler(SimpleHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
-    # Handle CORS preflight options request
+    # Handle browser preflight request before actual api request
     def do_OPTIONS(self):
         self._set_json_headers(HTTPStatus.NO_CONTENT)
 
-    # Handle GET endpoints and static frontend assets
+    # handle request for model information, evaluation and other resiurces.
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
@@ -116,18 +104,17 @@ class FakeLensRequestHandler(SimpleHTTPRequestHandler):
             return
 
         elif path == "/api/benchmarks" or path == "/api/metrics":
-            # Serve complete benchmark metrics from registry
+
             self._set_json_headers(HTTPStatus.OK)
             self.wfile.write(json.dumps(MODEL_REGISTRY).encode("utf-8"))
             return
 
-        # Serve static frontend files (SPA fallback to index.html)
         if path == "/" or not os.path.exists(os.path.join(FRONTEND_DIR, path.lstrip("/"))):
             self.path = "/index.html"
 
         return super().do_GET()
 
-    # Handle POST inference analysis requests
+    # receive the uploaded image
     def do_POST(self):
         parsed = urlparse(self.path)
         path = parsed.path
@@ -203,7 +190,7 @@ class FakeLensRequestHandler(SimpleHTTPRequestHandler):
         self.wfile.write(json.dumps({"error": f"Endpoint not found: {path}"}).encode("utf-8"))
 
 
-# Initialize and start threaded HTTP application server
+# start the application server using the given host address and port
 def run_server(port=PORT, bind="127.0.0.1"):
     server_address = (bind, port)
     httpd = ThreadedHTTPServer(server_address, FakeLensRequestHandler)

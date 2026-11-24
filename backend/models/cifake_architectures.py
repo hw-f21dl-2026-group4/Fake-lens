@@ -1,38 +1,32 @@
-# cifake model architectures for 32x32 image classification
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
-# 3-block cnn baseline for 32x32 cifake images
+#define a convolutional neural netwokr for cifake image classification
 class CIFAKECNN(nn.Module):
+    #conatructor to initialize the layers of the cnn architecture
     def __init__(self, dropout_rate: float = 0.4):
         super(CIFAKECNN, self).__init__()
 
-        # block 1: 3 -> 32
         self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(32)
         self.pool1 = nn.MaxPool2d(2, 2)
 
-        # block 2: 32 -> 64
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(64)
         self.pool2 = nn.MaxPool2d(2, 2)
 
-        # block 3: 64 -> 128
         self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1, bias=False)
         self.bn3 = nn.BatchNorm2d(128)
         self.pool3 = nn.MaxPool2d(2, 2)
 
-        # classification head
         self.flatten = nn.Flatten()
         self.fc1 = nn.Linear(128 * 4 * 4, 128, bias=False)
         self.bn_fc = nn.BatchNorm1d(128)
         self.dropout = nn.Dropout(dropout_rate)
         self.fc_out = nn.Linear(128, 1)
 
-    # compute logits for binary classification
+    #process the image through the convolutional and classification layer
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.pool1(F.relu(self.bn1(self.conv1(x))))
         x = self.pool2(F.relu(self.bn2(self.conv2(x))))
@@ -43,12 +37,11 @@ class CIFAKECNN(nn.Module):
         return x.squeeze(-1)
 
 
-# 4-layer mlp baseline for flattened 3072-d pixel vectors
+# define a mlp that uses flattened image pixels instead of convolution layers
 class CIFAKEMLP(nn.Module):
     def __init__(self, input_dim: int = 3072, dropout_rate: float = 0.3):
         super(CIFAKEMLP, self).__init__()
 
-        # dense layers with batchnorm and dropout
         self.fc1 = nn.Linear(input_dim, 512, bias=False)
         self.bn1 = nn.BatchNorm1d(512)
         self.drop1 = nn.Dropout(dropout_rate)
@@ -63,7 +56,7 @@ class CIFAKEMLP(nn.Module):
 
         self.fc_out = nn.Linear(64, 1)
 
-    # forward pass for mlp binary prediction
+    # pass the flattened pixel values thrigh the fully connected layeres
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if x.dim() > 2:
             x = x.view(x.size(0), -1)

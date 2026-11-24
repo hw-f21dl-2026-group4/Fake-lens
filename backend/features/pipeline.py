@@ -1,14 +1,3 @@
-"""
-Feature pipeline and caching utilities for classical ML models (KNN, Random Forest, MLP).
-
-Workflow:
-1. Iterates over manifest splits (train, val, test).
-2. Extracts the 1,690-dimensional feature vector per image.
-3. Caches raw features to `results/features_cache/` in compressed .npz / parquet format.
-4. Fits StandardScaler ONLY on the training split, and transforms validation and test splits without leakage.
-5. Saves the fitted pipeline via joblib so inference reproduces identical scaling.
-"""
-
 from pathlib import Path
 from typing import Tuple, Dict, Any
 import numpy as np
@@ -23,16 +12,8 @@ from sklearn.impute import SimpleImputer
 from backend.features.extractors import extract_all_features
 from backend.datasets.dff_dataset import BINARY_LABEL_MAP, SOURCE_CLASS_MAP
 
-
+#Read the images listed in the dataset manifest and extract their features
 def extract_split_features(manifest_csv: str | Path, root_dir: str | Path = ".", max_samples: int = None) -> Dict[str, Any]:
-    """
-    Extracts features for all images in a given manifest CSV.
-    Returns a dictionary with:
-    - 'X': float32 numpy array of shape (N, 1690)
-    - 'y_binary': int64 array of shape (N,)
-    - 'y_source': int64 array of shape (N,)
-    - 'image_ids': list of strings
-    """
     root = Path(root_dir)
     df = pd.read_csv(manifest_csv)
     if max_samples is not None:
@@ -64,11 +45,8 @@ def extract_split_features(manifest_csv: str | Path, root_dir: str | Path = ".",
         "image_ids": image_ids
     }
 
-
+# Fit the preprocessing pipeline using training features only.
 def build_and_fit_scaler(X_train: np.ndarray, save_path: str | Path = None) -> Pipeline:
-    """
-    Fits an Imputer + StandardScaler pipeline strictly on training features.
-    """
     pipeline = Pipeline([
         ("imputer", SimpleImputer(strategy="median")),
         ("scaler", StandardScaler())

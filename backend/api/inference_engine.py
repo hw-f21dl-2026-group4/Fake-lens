@@ -1,23 +1,3 @@
-"""
-FakeLens Unified Multi-Dataset, Multi-Model Inference Engine.
-
-Supports three forensic dataset domains:
-1. DeepFakeFace: Facial forgery detection & attribution (Binary: REAL/FAKE; Multiclass: wiki, text2img, inpainting, insight)
-2. ArtiFact: General imagery forgery detection & attribution (Binary: REAL/FAKE; Multiclass: REAL, GAN, DIFFUSION, INPAINTING, TRANSFORMER)
-3. CIFAKE: Synthetic vs. authentic 32x32 image discrimination (Binary: REAL/FAKE)
-
-Supports five model families across domains:
-1. EfficientNet-B0 (Transfer learning compound-scaled CNN)
-2. Custom CNN (Deep convolutional neural network for raw pixel artifacts)
-3. Random Forest (Bagging ensemble)
-4. MLP (Multi-Layer Perceptron)
-5. KNN (K-Nearest Neighbors)
-
-All 24 verified operational models run with lazy-loading, memory-safe bounded caching, and device management:
-- PyTorch neural models run on CUDA GPU (with CPU fallback).
-- Classical scikit-learn models run on CPU over extracted feature vectors.
-"""
-
 import io
 import time
 import uuid
@@ -39,7 +19,6 @@ from backend.features.extractors_v3 import extract_extended_forensic_features
 from backend.models.cifake_architectures import CIFAKECNN, CIFAKEMLP
 from backend.preprocessing.cifake_preprocessing import preprocess_cifake_image
 
-# Load central registry
 REGISTRY_PATH = os.path.join(os.path.dirname(__file__), "model_registry.json")
 with open(REGISTRY_PATH, "r") as f:
     MODEL_REGISTRY = json.load(f)
@@ -52,8 +31,9 @@ INFERENCE_TRANSFORMS = transforms.Compose([
 ])
 
 
-# Central inference engine managing 24 operational models across 3 datasets
+# keep all model loading and image prediction operation in one place
 class UnifiedInferenceEngine:
+    # set up the initial resources needed by the prediction engine
     def __init__(self):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.registry = MODEL_REGISTRY
@@ -62,11 +42,11 @@ class UnifiedInferenceEngine:
         self.is_ready = True
         print(f"[FakeLens Engine] Initialized Unified Inference Engine on device: {self.device}")
 
-    # Generate composite lookup key for model cache
+    #create a unique key using the dataset, task, and model family
     def _get_model_key(self, dataset: str, task: str, family: str) -> str:
         return f"{dataset.lower()}_{task.lower()}_{family.lower()}"
 
-    # Retrieve model metadata and paths from registry
+    #get details of selected model from the registry
     def get_model_info(self, dataset: str, task: str, family: str) -> Dict[str, Any]:
         ds_key = dataset.lower()
         task_key = task.lower()
@@ -81,7 +61,7 @@ class UnifiedInferenceEngine:
 
         return self.registry[ds_key][task_key][fam_key]
 
-    # Load frozen model checkpoint into bounded memory cache
+    # load the required trained model
     def _load_model(self, dataset: str, task: str, family: str):
         key = self._get_model_key(dataset, task, family)
         if key in self.models_cache:
@@ -95,7 +75,6 @@ class UnifiedInferenceEngine:
         if not os.path.exists(ckpt_path):
             raise FileNotFoundError(f"Checkpoint for {key} not found at: {ckpt_path}")
 
-        # Evict cache if too large (simple FIFO eviction)
         if len(self.models_cache) >= self.max_cached_models:
             first_key = next(iter(self.models_cache))
             print(f"[FakeLens Engine] Evicting model {first_key} from RAM/VRAM cache.")
@@ -168,11 +147,8 @@ class UnifiedInferenceEngine:
         self.models_cache[key] = loaded_obj
         return loaded_obj
 
+    #convert the input image into 1798 numerical features
     def extract_image_features_1798(self, pil_img: Image.Image) -> np.ndarray:
-        """
-        Extracts 1,798 forensic features (1,690 base + 108 extended spatial/frequency)
-        for classical machine learning models.
-        """
         rgb_arr = np.array(pil_img.convert("RGB"))
         if rgb_arr.shape[0] != 224 or rgb_arr.shape[1] != 224:
             pil_resized = pil_img.resize((224, 224), Image.BILINEAR)
@@ -184,7 +160,7 @@ class UnifiedInferenceEngine:
         vec_1798 = np.nan_to_num(vec_1798, nan=0.0, posinf=1.0, neginf=-1.0)
         return vec_1798.reshape(1, -1)
 
-    # Predict binary probability for CIFAKE single-output network
+    # get prediciton probabilities 
     def _predict_cifake_neural(self, model: nn.Module, tensor: torch.Tensor) -> List[float]:
         with torch.inference_mode():
             logit = model(tensor)
@@ -192,7 +168,7 @@ class UnifiedInferenceEngine:
             prob_real = 1.0 - prob_fake
             return [prob_real, prob_fake]
 
-    # Predict multiclass or binary softmax probabilities for PyTorch models
+    # pass the prepared image tensor through the neural network and get the class probabilities
     def _predict_neural(self, model: nn.Module, tensor: torch.Tensor) -> List[float]:
         with torch.inference_mode():
             logits = model(tensor)
@@ -201,7 +177,6 @@ class UnifiedInferenceEngine:
                 probs = [1.0 - probs, probs]
             return [float(p) for p in probs]
 
-    # Predict class probabilities using scikit-learn models and pipelines
     def _predict_classical(self, raw_obj: Any, feat_vec: np.ndarray, model_type: str) -> List[float]:
         # Handle dict wrappers
         if isinstance(raw_obj, dict):
@@ -224,21 +199,16 @@ class UnifiedInferenceEngine:
 
         return [float(p) for p in probs]
 
+    #first check whether the image is real or fake
     def analyze_image(
         self,
         image_bytes: bytes,
         dataset: str = "deepfakeface",
         model_family: str = "efficientnet_b0"
     ) -> Dict[str, Any]:
-        """
-        Unified multi-dataset, multi-model analysis.
-        Runs Stage 1: Binary Detection (REAL vs FAKE).
-        If FAKE: Runs Stage 2: Multiclass Attribution using the matching model family & dataset.
-        """
         ds = dataset.lower().strip()
         fam = model_family.lower().strip()
 
-        # Map common aliases
         if fam in ["cnn", "custom_cnn"]:
             fam = "cnn"
         elif fam in ["efficientnet", "efficientnet_b0", "efficientnet-b0"]:
@@ -259,7 +229,7 @@ class UnifiedInferenceEngine:
         request_id = str(uuid.uuid4())
         start_time = time.perf_counter()
 
-        # Decode image
+        # Image decoding 
         try:
             pil_img = Image.open(io.BytesIO(image_bytes))
             img_format = pil_img.format if pil_img.format else "UNKNOWN"
@@ -272,7 +242,6 @@ class UnifiedInferenceEngine:
 
         bin_info = self.get_model_info(ds, "binary", fam)
 
-        # 1. CIFAKE Special Pathway (32x32 native image / pixel representation, Binary Only)
         if ds == "cifake":
             cifake_input = preprocess_cifake_image(pil_img, fam, device=self.device)
             bin_model = self._load_model("cifake", "binary", fam)
@@ -330,7 +299,6 @@ class UnifiedInferenceEngine:
             }
         multi_info = self.get_model_info(ds, "multiclass", fam)
 
-        # Precompute inputs
         tensor = None
         feat_vec = None
         is_neural = "neural" in bin_info["type"]
@@ -340,7 +308,6 @@ class UnifiedInferenceEngine:
         else:
             feat_vec = self.extract_image_features_1798(pil_img)
 
-        # 1. Run Binary Model
         bin_model = self._load_model(ds, "binary", fam)
         if is_neural:
             bin_probs = self._predict_neural(bin_model, tensor)
@@ -351,7 +318,6 @@ class UnifiedInferenceEngine:
         bin_decision = bin_info["class_order"][bin_pred_idx]
         bin_conf = bin_probs[bin_pred_idx]
 
-        # 2. Conditional Multiclass Model
         multiclass_result = None
         disagreement_warning = None
 
@@ -372,7 +338,6 @@ class UnifiedInferenceEngine:
             multi_label = multi_info["display_labels"][multi_pred_idx]
             multi_conf = multi_probs[multi_pred_idx]
 
-            # Construct class probabilities list
             prob_list = []
             for i, p in enumerate(multi_probs):
                 c_name = multi_info["class_order"][i]
@@ -384,9 +349,6 @@ class UnifiedInferenceEngine:
                     "probability_pct": round(float(p) * 100, 2)
                 })
 
-            # Check for binary/multiclass disagreement
-            # For DeepFakeFace: multi_pred_idx == 0 is wiki (REAL)
-            # For ArtiFact: multi_pred_idx == 0 is REAL
             if multi_pred_idx == 0:
                 disagreement_warning = (
                     f"Note: The {bin_info['family']} binary detector classified this image as FAKE ({round(bin_conf*100, 1)}%), "
@@ -452,10 +414,9 @@ class UnifiedInferenceEngine:
             "disclaimer": "AI predictions are probabilistic research estimates. FakeLens is an academic research prototype."
         }
 
-    # Backward compatibility method for existing endpoints
+    # convert the uploaded image bytes into an image that engine can process
     def analyze_image_bytes(self, image_bytes: bytes, model_family: str = "CNN", dataset: str = "deepfakeface") -> Dict[str, Any]:
         return self.analyze_image(image_bytes, dataset=dataset, model_family=model_family)
-
 
 # Singleton engine instance
 engine = UnifiedInferenceEngine()

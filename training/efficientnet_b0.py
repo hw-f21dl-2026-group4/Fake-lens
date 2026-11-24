@@ -1,12 +1,3 @@
-"""
-EfficientNet-B0 Transfer Learning Training and Architecture Specification for FakeLens.
-Supports:
-- DeepFakeFace Binary (2 classes)
-- DeepFakeFace Multiclass (4 classes) [Preserved 7-epoch halted checkpoint]
-- ArtiFact Binary (2 classes)
-- ArtiFact Multiclass (5 classes)
-"""
-
 import os
 import argparse
 import torch
@@ -14,9 +5,8 @@ import torch.nn as nn
 import torchvision.models as models
 from torchvision.models import efficientnet_b0, EfficientNet_B0_Weights
 
-
+#create an EfficientNet-B0 model with a custom classification head for transfer learning    
 def create_efficientnet_b0(num_classes: int = 2, pretrained: bool = True, dropout: float = 0.2) -> nn.Module:
-    """Constructs EfficientNet-B0 with custom classification head for binary/multiclass forensic detection."""
     weights = EfficientNet_B0_Weights.DEFAULT if pretrained else None
     model = efficientnet_b0(weights=weights)
     in_features = model.classifier[1].in_features
@@ -28,10 +18,6 @@ def create_efficientnet_b0(num_classes: int = 2, pretrained: bool = True, dropou
 
 
 def train_efficientnet_b0(dataset: str, task: str, epochs: int = 20, batch_size: int = 32, lr: float = 1e-4, dry_run: bool = False):
-    """
-    Consolidated training routine for EfficientNet-B0 transfer learning.
-    Dry-run mode verifies configuration, architecture, and head replacement without gradient updates.
-    """
     num_classes = 2 if task == "binary" else (4 if dataset.lower() == "deepfakeface" else 5)
     print(f"[EfficientNet-B0 Training] Initializing {dataset.upper()} | {task.upper()} | {num_classes} Classes")
 

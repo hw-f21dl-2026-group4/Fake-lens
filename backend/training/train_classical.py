@@ -1,23 +1,12 @@
-"""
-Training and Evaluation Pipeline for FakeLens Classical Models (KNN, Random Forest, MLP).
-- Loads cached features from results/features_cache/
-- Uses validation split for model tuning/selection
-- Evaluates on the held-out test split
-- Computes Accuracy, Precision, Recall, F1-score, and Confusion Matrix
-- Saves trained models to results/models/ and metrics to results/
-"""
-
 import time
 from pathlib import Path
 import numpy as np
 import pandas as pd
 import joblib
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
-
 from backend.models.classical_models import get_knn_model, get_random_forest_model, get_mlp_model
 
-
-# Compute evaluation metrics including accuracy, precision, and F1
+#Compare the predicted labels woth the actual labels
 def evaluate_predictions(y_true, y_pred, model_name: str) -> dict:
     acc = accuracy_score(y_true, y_pred)
     prec = precision_score(y_true, y_pred, average="binary", zero_division=0)
@@ -42,8 +31,7 @@ def evaluate_predictions(y_true, y_pred, model_name: str) -> dict:
         "confusion_matrix": cm.tolist()
     }
 
-
-# Train and evaluate classical machine learning model family
+#train and compare knn, random forest and mlp using extracvted image features
 def train_and_eval_classical_models():
     print("=" * 60)
     print(" FakeLens: Training & Evaluating Classical Models (KNN, RF, MLP)")
@@ -80,7 +68,7 @@ def train_and_eval_classical_models():
     t0 = time.time()
     best_k = 5
     best_val_f1 = -1
-    # Check k in [3, 5, 7] on validation set
+
     for k in [3, 5, 7]:
         knn_candidate = get_knn_model(n_neighbors=k)
         knn_candidate.fit(X_train, y_train)
@@ -97,7 +85,6 @@ def train_and_eval_classical_models():
     knn_train_time = time.time() - t0
     joblib.dump(best_knn, models_dir / "knn_model.joblib")
 
-    # Evaluate on held-out test
     test_pred_knn = best_knn.predict(X_test)
     res_knn = evaluate_predictions(y_test, test_pred_knn, f"KNN (k={best_k})")
     res_knn["train_time_sec"] = knn_train_time
@@ -112,11 +99,9 @@ def train_and_eval_classical_models():
     joblib.dump(rf, models_dir / "random_forest_model.joblib")
     print(f"Random Forest trained in {rf_train_time:.1f}s.")
 
-    # Validation check
     val_pred_rf = rf.predict(X_val)
     print(f"  RF Val F1: {f1_score(y_val, val_pred_rf, average='binary'):.4f}")
 
-    # Evaluate on held-out test
     test_pred_rf = rf.predict(X_test)
     res_rf = evaluate_predictions(y_test, test_pred_rf, "Random Forest")
     res_rf["train_time_sec"] = rf_train_time
@@ -131,17 +116,14 @@ def train_and_eval_classical_models():
     joblib.dump(mlp, models_dir / "mlp_model.joblib")
     print(f"MLP trained in {mlp_train_time:.1f}s across {mlp.n_iter_} iterations.")
 
-    # Validation check
     val_pred_mlp = mlp.predict(X_val)
     print(f"  MLP Val F1: {f1_score(y_val, val_pred_mlp, average='binary'):.4f}")
 
-    # Evaluate on held-out test
     test_pred_mlp = mlp.predict(X_test)
     res_mlp = evaluate_predictions(y_test, test_pred_mlp, "MLP")
     res_mlp["train_time_sec"] = mlp_train_time
     results.append(res_mlp)
 
-    # Save summary dataframe
     summary_df = pd.DataFrame([{
         "Model": r["model"],
         "Accuracy": r["accuracy"],
