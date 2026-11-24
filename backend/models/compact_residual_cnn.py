@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-#use a shortcut connection to preserve useful information
+#uses a shortcut connection to preserve useful information
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels: int, out_channels: int, stride: int = 1):
         super(ResidualBlock, self).__init__()
@@ -68,7 +68,7 @@ class CompactResidualCNNPhase9(nn.Module):
 
         self._init_weights()
 
-    #Initialize the network weights before training begins
+    #Initializes the network weights before the training begins
     def _init_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
