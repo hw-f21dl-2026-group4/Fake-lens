@@ -2,7 +2,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 
-# Create a KNN classifier that predicts a class using nearby feature samples.
+# Creates a KNN classifier that predicts a class using nearby feature samples.
 def get_knn_model(n_neighbors: int = 5, metric: str = "euclidean") -> KNeighborsClassifier:
     return KNeighborsClassifier(
         n_neighbors=n_neighbors,
@@ -11,7 +11,7 @@ def get_knn_model(n_neighbors: int = 5, metric: str = "euclidean") -> KNeighbors
         n_jobs=-1
     )
 
-# Create a Random Forest classifier that combines predictions from multiple descion trees
+# Creates a Random Forest classifier that combines predictions from multiple descion trees
 def get_random_forest_model(n_estimators: int = 150, max_depth: int = 25, random_state: int = 42) -> RandomForestClassifier:
     return RandomForestClassifier(
         n_estimators=n_estimators,
@@ -20,7 +20,7 @@ def get_random_forest_model(n_estimators: int = 150, max_depth: int = 25, random
         n_jobs=-1
     )
 
-#create a neural network classifiew that learns relationahips betwwn numerical image feature through hidden layers
+#creates a neural network classifier that learns relationahips betwwn numerical image feature through hidden layers
 def get_mlp_model(hidden_layer_sizes: tuple = (256, 128, 64), max_iter: int = 100, random_state: int = 42) -> MLPClassifier:
     return MLPClassifier(
         hidden_layer_sizes=hidden_layer_sizes,
