@@ -11,7 +11,7 @@
 </head>
 <body>
 
-  <!-- Navigation Bar -->
+  <!-- navigation bar -->
   <nav class="navbar">
     <div class="nav-brand" onclick="navigateTo('home')">
       <div class="brand-icon">F</div>
@@ -19,7 +19,7 @@
       <span class="brand-badge">Academic Prototype</span>
     </div>
 
-    <!-- Central Dataset Domain Switcher -->
+    <!-- central dataset domain switcher -->
     <div class="dataset-switcher-container">
       <div class="dataset-switcher-header">
         <span class="switcher-prefix">DATASET:</span>
@@ -39,7 +39,7 @@
         </button>
       </div>
 
-      <!-- Mobile / Compact Dropdown (visible on smaller screens) -->
+      <!-- compact dropdown for small screens -->
       <div class="dataset-compact-select-wrapper">
         <span class="compact-select-icon">📁</span>
         <select id="datasetCompactSelect" class="dataset-compact-select" onchange="switchGlobalDataset(this.value)" aria-label="Select Dataset">
@@ -63,7 +63,7 @@
     </div>
   </nav>
 
-  <!-- Domain Notification Toast / Banner -->
+  <!-- domain notification banner -->
   <div class="domain-indicator-banner" id="domainBanner">
     <div class="domain-banner-inner">
       <span class="domain-badge-active" id="domainBadgeActive">DeepFakeFace</span>
@@ -71,10 +71,10 @@
     </div>
   </div>
 
-  <!-- Main View Container -->
+  <!-- main container -->
   <main class="main-container">
 
-    <!-- VIEW 1: HOME DASHBOARD -->
+    <!-- home dashboard view -->
     <section id="view-home" class="view-section active">
       <div class="hero-card">
         <h1 class="hero-title" id="heroTitle">Detect Facial Forgeries.<br>Attribute Their Origins.</h1>
@@ -87,7 +87,7 @@
         </button>
       </div>
 
-      <!-- Domain Capabilities Grid -->
+      <!-- domain capabilities grid -->
       <div class="grid-4" id="homeStatsGrid">
         <div class="feature-card">
           <div class="feature-icon">&#128269;</div>
@@ -123,7 +123,7 @@
       </div>
     </section>
 
-    <!-- VIEW 2: IMAGE ANALYSIS -->
+    <!-- image analysis view -->
     <section id="view-analyze" class="view-section">
       <div class="upload-wrapper">
         <div class="analysis-header-row">
@@ -139,7 +139,7 @@
           </div>
         </div>
 
-        <!-- Domain Notice Banner -->
+        <!-- domain notice banner -->
         <div class="domain-suitability-note" id="domainSuitabilityNote">
           <span class="note-icon">&#9432;</span>
           <span id="domainSuitabilityText">
@@ -147,7 +147,7 @@
           </span>
         </div>
 
-        <!-- Dropzone -->
+        <!-- dropzone -->
         <div class="drop-zone" id="dropZone">
           <div class="drop-icon">&#128193;</div>
           <div class="drop-text">Drag and drop an image here, or click to browse</div>
@@ -155,7 +155,7 @@
           <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" style="display: none;">
         </div>
 
-        <!-- File Preview Area -->
+        <!-- file preview area -->
         <div class="file-preview-area" id="previewArea">
           <div class="preview-content">
             <div class="preview-img-box">
@@ -165,7 +165,7 @@
               <div class="preview-filename" id="previewFileName">filename.jpg</div>
               <div class="preview-meta" id="previewFileMeta">Size: 0 KB | Dimensions: Calculating...</div>
 
-              <!-- Model Family Selector -->
+              <!-- model family selector -->
               <div class="model-selector-group">
                 <label for="modelFamilySelect" class="model-selector-label">Detection Model Family:</label>
                 <div class="select-wrapper">
@@ -195,17 +195,17 @@
         </div>
       </div>
 
-      <!-- Disagreement Banner (Visible if binary and multiclass disagree) -->
+      <!-- disagreement warning if binary and multiclass diverge -->
       <div id="disagreementBanner" class="disagreement-banner" style="display: none;">
         <span>&#9888;</span>
         <span id="disagreementText"></span>
       </div>
 
-      <!-- Analysis Results Area -->
+      <!-- analysis results panel -->
       <div class="results-wrapper" id="resultsWrapper">
         <div class="results-grid" id="resultsGrid">
 
-          <!-- Panel 1: Binary Detection -->
+          <!-- binary detection card -->
           <div class="result-card" id="binaryCard">
             <div class="result-card-header">
               <div>
@@ -241,14 +241,14 @@
               Explanation text here.
             </p>
 
-            <!-- Conditional Note for REAL predictions -->
+            <!-- real prediction attribution notice -->
             <div id="realAttributionNote" class="real-attribution-note" style="display: none;">
               <span class="info-icon">&#9432;</span>
               <span>Source attribution was not performed because the selected binary model predicted REAL.</span>
             </div>
           </div>
 
-          <!-- Panel 2: Multiclass Attribution -->
+          <!-- multiclass attribution card -->
           <div class="result-card" id="multiclassCard">
             <div class="result-card-header">
               <div>
@@ -259,7 +259,7 @@
             </div>
 
             <div id="multiclassList">
-              <!-- Rendered via JavaScript -->
+              <!-- rendered by javascript -->
             </div>
 
             <p id="multiclassExplanation" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1.25rem; line-height: 1.5; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
@@ -275,7 +275,7 @@
       </div>
     </section>
 
-    <!-- VIEW 3: MODEL COMPARISON -->
+    <!-- model comparison view -->
     <section id="view-comparison" class="view-section">
       <div class="comparison-header">
         <div>
@@ -285,7 +285,7 @@
           </p>
         </div>
 
-        <!-- Filter Controls -->
+        <!-- filter controls -->
         <div class="comp-filter-bar">
           <div class="filter-item">
             <label for="compDatasetSelect">Benchmark Dataset:</label>
@@ -317,7 +317,7 @@
         </div>
       </div>
 
-      <!-- Interactive Benchmark Bar Charts -->
+      <!-- benchmark comparison charts -->
       <div class="charts-grid-container" id="chartsContainer">
         <div class="chart-card">
           <div class="chart-card-header">
@@ -325,7 +325,7 @@
             <span class="chart-subtitle" id="binaryChartSubtitle">DeepFakeFace V4 6,000 Val Samples</span>
           </div>
           <div class="bar-chart-visual" id="binaryAccuracyChart">
-            <!-- Rendered via JS -->
+            <!-- rendered by javascript -->
           </div>
         </div>
 
@@ -335,12 +335,12 @@
             <span class="chart-subtitle" id="multiclassChartSubtitle">DeepFakeFace V4 6,000 Val Samples</span>
           </div>
           <div class="bar-chart-visual" id="multiclassMacroF1Chart">
-            <!-- Rendered via JS -->
+            <!-- rendered by javascript -->
           </div>
         </div>
       </div>
 
-      <!-- Detailed Comparison Tables -->
+      <!-- benchmark comparison tables -->
       <div id="binaryTableSection">
         <h3 style="font-size: 1.15rem; margin-bottom: 1rem; color: var(--accent-cyan); display: flex; align-items: center; justify-content: space-between;">
           <span id="binaryTableHeading">Dedicated Binary Classifiers (Real vs Fake)</span>
@@ -360,7 +360,7 @@
               </tr>
             </thead>
             <tbody id="binaryTableBody">
-              <!-- Populated via API -->
+              <!-- populated by javascript -->
             </tbody>
           </table>
         </div>
@@ -385,14 +385,14 @@
               </tr>
             </thead>
             <tbody id="multiclassTableBody">
-              <!-- Populated via API -->
+              <!-- populated by javascript -->
             </tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- VIEW 4: METHODOLOGY & RESEARCH -->
+    <!-- methodology view -->
     <section id="view-research" class="view-section">
       <h2 style="margin-bottom: 0.5rem;">Research Methodology</h2>
       <p style="color: var(--text-muted); margin-bottom: 2rem;">
@@ -436,7 +436,7 @@
       </div>
     </section>
 
-    <!-- VIEW 5: ABOUT -->
+    <!-- about view -->
     <section id="view-about" class="view-section">
       <h2 style="margin-bottom: 0.5rem;">About FakeLens</h2>
       <p style="color: var(--text-muted); margin-bottom: 2rem;">
@@ -456,7 +456,7 @@
       </div>
     </section>
 
-    <!-- Footer -->
+    <!-- footer -->
     <footer class="footer-disclaimer">
       <p>FakeLens &copy; 2026 &bull; University Research Project &bull; 20 Verified Models &bull; RTX 3050 CUDA Acceleration</p>
       <p style="margin-top: 0.4rem; font-size: 0.75rem;">DeepFakeFace (V4 60K Benchmark) &bull; ArtiFact (55K Benchmark)</p>

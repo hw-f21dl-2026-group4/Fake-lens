@@ -1,13 +1,6 @@
-/**
- * FakeLens Frontend Application Logic
- * Single Page Application router, image drag-and-drop, API communication,
- * multi-dataset domain switching (DeepFakeFace vs ArtiFact), multi-model family selection,
- * conditional two-stage inference display, and academic benchmark visualization.
- */
-
-// Global state
+// global state
 let currentSelectedFile = null;
-let currentDataset = 'deepfakeface'; // 'deepfakeface' or 'artifact'
+let currentDataset = 'deepfakeface';
 let cachedRegistryData = null;
 
 const MODEL_DESCRIPTIONS = {
@@ -66,7 +59,7 @@ const DATASET_INFO = {
     }
 };
 
-// Bi-directional dataset change from Comparison page dropdown
+// handle dataset change from comparison tab
 function onCompDatasetChange(ds) {
     if (ds && ds !== currentDataset) {
         switchGlobalDataset(ds);
@@ -75,6 +68,8 @@ function onCompDatasetChange(ds) {
         renderComparisonCharts();
     }
 }
+
+// switch active view section
 function navigateTo(viewId) {
     const views = document.querySelectorAll('.view-section');
     const navItems = document.querySelectorAll('.nav-item');
@@ -98,14 +93,12 @@ function navigateTo(viewId) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ==========================================
-// 2. Global Dataset Domain Switcher
-// ==========================================
+// switch dataset domain and sync ui
 function switchGlobalDataset(ds) {
     if (ds !== 'deepfakeface' && ds !== 'artifact' && ds !== 'cifake') return;
     currentDataset = ds;
 
-    // Update segmented buttons
+    // update segmented buttons
     const btnDff = document.getElementById('btnDsDeepfakeface');
     const btnArt = document.getElementById('btnDsArtifact');
     const btnCif = document.getElementById('btnDsCifake');
@@ -113,13 +106,13 @@ function switchGlobalDataset(ds) {
     if (btnArt) btnArt.classList.toggle('active', ds === 'artifact');
     if (btnCif) btnCif.classList.toggle('active', ds === 'cifake');
 
-    // Update compact select if present
+    // update compact selector
     const compactSelect = document.getElementById('datasetCompactSelect');
     if (compactSelect && compactSelect.value !== ds) {
         compactSelect.value = ds;
     }
 
-    // Update Banner & UI elements
+    // update banner and ui text
     const info = DATASET_INFO[ds];
     const domainBadgeActive = document.getElementById('domainBadgeActive');
     const domainDescription = document.getElementById('domainDescription');
@@ -145,7 +138,7 @@ function switchGlobalDataset(ds) {
     if (domainSuitabilityText) domainSuitabilityText.innerHTML = info.suitability;
     if (compDatasetSelect) compDatasetSelect.value = ds;
 
-    // Update Model Family Dropdown dynamically based on selected dataset
+    // update model selector options for dataset
     const modelFamilySelect = document.getElementById('modelFamilySelect');
     if (modelFamilySelect) {
         const prevFam = modelFamilySelect.value;
@@ -178,20 +171,18 @@ function switchGlobalDataset(ds) {
         onModelFamilyChange();
     }
 
-    // Reset previous inference view to reflect domain switch
+    // reset previous inference display
     const resultsWrapper = document.getElementById('resultsWrapper');
     const disagreementBanner = document.getElementById('disagreementBanner');
     if (resultsWrapper) resultsWrapper.classList.remove('active');
     if (disagreementBanner) disagreementBanner.style.display = 'none';
 
-    // Re-render comparison benchmarks for selected dataset
+    // refresh benchmark charts for domain
     filterBenchmarks();
     renderComparisonCharts();
 }
 
-// ==========================================
-// 3. Health & Registry Initializer
-// ==========================================
+// verify server health and model count
 async function checkEngineHealth() {
     const pill = document.getElementById('engineStatusPill');
     const statusText = document.getElementById('engineStatusText');
@@ -221,9 +212,7 @@ async function checkEngineHealth() {
     }
 }
 
-// ==========================================
-// 4. Model Selector Handler
-// ==========================================
+// update UI when model family changes
 function onModelFamilyChange() {
     const select = document.getElementById('modelFamilySelect');
     const hint = document.getElementById('modelArchHint');
@@ -235,12 +224,12 @@ function onModelFamilyChange() {
     if (!select) return;
     const selectedFamily = select.value;
 
-    // Update architecture hint
+    // update architecture hint text
     if (hint && MODEL_DESCRIPTIONS[selectedFamily]) {
         hint.textContent = MODEL_DESCRIPTIONS[selectedFamily];
     }
 
-    // Update badges
+    // update model badge labels
     const familyLabels = {
         'efficientnet_b0': 'EfficientNet-B0',
         'cnn': 'Custom CNN',
@@ -252,20 +241,18 @@ function onModelFamilyChange() {
     if (binaryModelTag) binaryModelTag.textContent = `Model: ${displayFam}`;
     if (multiclassModelTag) multiclassModelTag.textContent = `Model: ${displayFam}`;
 
-    // Reset previous inference display
+    // clear prior results
     if (resultsWrapper) resultsWrapper.classList.remove('active');
     if (disagreementBanner) disagreementBanner.style.display = 'none';
 
-    // Highlight button to re-run
+    // enable analyze button if image selected
     const btnAnalyze = document.getElementById('btnAnalyze');
     if (btnAnalyze && currentSelectedFile) {
         btnAnalyze.disabled = false;
     }
 }
 
-// ==========================================
-// 5. Image Selection & Validation
-// ==========================================
+// format file size in kb or mb
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -274,6 +261,7 @@ function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+// validate and preview selected image
 function handleImageFile(file) {
     if (!file) return;
 
@@ -298,17 +286,17 @@ function handleImageFile(file) {
     const resultsWrapper = document.getElementById('resultsWrapper');
     const disagreementBanner = document.getElementById('disagreementBanner');
 
-    // Hide old results and disagreement banners on new selection
+    // hide old results
     if (resultsWrapper) resultsWrapper.classList.remove('active');
     if (disagreementBanner) disagreementBanner.style.display = 'none';
 
-    // Populate preview
+    // load preview image
     const reader = new FileReader();
     reader.onload = (e) => {
         previewImage.src = e.target.result;
         previewFileName.textContent = file.name;
 
-        // Measure natural dimensions
+        // read image dimensions
         const tmpImg = new Image();
         tmpImg.onload = () => {
             previewFileMeta.textContent = `Size: ${formatFileSize(file.size)} | Dimensions: ${tmpImg.naturalWidth} × ${tmpImg.naturalHeight} px`;
@@ -321,6 +309,7 @@ function handleImageFile(file) {
     reader.readAsDataURL(file);
 }
 
+// clear image selection and reset state
 function resetUpload() {
     currentSelectedFile = null;
     const fileInput = document.getElementById('fileInput');
@@ -348,9 +337,7 @@ function resetUpload() {
     if (btnAnalyzeText) btnAnalyzeText.textContent = 'Run Forensic Analysis';
 }
 
-// ==========================================
-// 6. Real Model Inference Execution
-// ==========================================
+// run model inference on uploaded image
 async function executeAnalysis() {
     if (!currentSelectedFile) {
         alert('Please select or drop an image first.');
@@ -369,7 +356,7 @@ async function executeAnalysis() {
     const realAttributionNote = document.getElementById('realAttributionNote');
     const resultsGrid = document.getElementById('resultsGrid');
 
-    // UI Loading state
+    // show loading state
     btnAnalyze.disabled = true;
     btnAnalyzeText.textContent = `Analyzing with ${selectedFamily}...`;
     if (resultsWrapper) resultsWrapper.classList.remove('active');
@@ -406,6 +393,7 @@ async function executeAnalysis() {
     }
 }
 
+// render binary and multiclass results
 function renderAnalysisResults(data, selectedFamily) {
     const resultsWrapper = document.getElementById('resultsWrapper');
     const resultsGrid = document.getElementById('resultsGrid');
@@ -432,7 +420,7 @@ function renderAnalysisResults(data, selectedFamily) {
     if (binaryModelTag) binaryModelTag.textContent = `${data.model_family} (${data.dataset.toUpperCase()})`;
     if (multiclassModelTag) multiclassModelTag.textContent = `${data.model_family} (${data.dataset.toUpperCase()})`;
 
-    // 1. Render Dedicated Binary Result
+    // render binary detection result
     const isReal = bin.decision === 'REAL';
     binaryBadge.textContent = `${bin.decision} (${bin.confidence_pct}%)`;
     binaryBadge.className = `decision-badge ${isReal ? 'real' : 'fake'}`;
@@ -446,9 +434,9 @@ function renderAnalysisResults(data, selectedFamily) {
     binaryFakeBar.style.width = `${fakeProb}%`;
     binaryExplanation.textContent = bin.explanation;
 
-    // 2. Conditional Two-Stage Display
+    // render multiclass conditional attribution
     if (data.dataset === 'cifake') {
-        // CIFAKE is strictly binary
+        // cifake dataset is binary only
         if (resultsGrid) resultsGrid.classList.add('single-card');
         if (multiclassCard) multiclassCard.style.display = 'none';
         if (multiclassList) multiclassList.innerHTML = '';
@@ -480,11 +468,11 @@ function renderAnalysisResults(data, selectedFamily) {
 
             const probs = (multi && multi.probabilities) ? multi.probabilities : [];
             if (probs.length > 0) {
-                // Sort probabilities descending
+                // sort attribution probabilities descending
                 const sortedProbs = [...probs].sort((a, b) => b.probability_pct - a.probability_pct);
                 const topAttribution = sortedProbs[0];
 
-                // Top Attributed Banner
+                // top attributed generator banner
                 const topBanner = document.createElement('div');
                 topBanner.className = 'top-attributed-banner';
                 topBanner.innerHTML = `
@@ -496,7 +484,7 @@ function renderAnalysisResults(data, selectedFamily) {
                 `;
                 multiclassList.appendChild(topBanner);
 
-                // Render all classes
+                // list all generator class probabilities
                 sortedProbs.forEach((item, index) => {
                     const isWinner = index === 0;
                     let barClass = 'fake';
@@ -529,7 +517,7 @@ function renderAnalysisResults(data, selectedFamily) {
         }
     }
 
-    // 3. Disagreement Warning
+    // display disagreement warning if binary and multiclass diverge
     if (data.disagreement_warning) {
         disagreementText.textContent = data.disagreement_warning;
         disagreementBanner.style.display = 'flex';
@@ -537,17 +525,15 @@ function renderAnalysisResults(data, selectedFamily) {
         disagreementBanner.style.display = 'none';
     }
 
-    // 4. Metadata
+    // show inference metadata
     inferenceMeta.textContent = `Domain: ${data.dataset_title} | Model: ${data.model_family} | Latency: ${data.processing_time_ms} ms | Device: ${data.device} | Resolution: ${data.image_meta.original_dimensions}`;
 
-    // Reveal results panel
+    // reveal results panel
     resultsWrapper.classList.add('active');
     resultsWrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// ==========================================
-// 7. Academic Benchmarks Dashboard
-// ==========================================
+// load benchmark metrics from backend
 async function loadBenchmarks() {
     try {
         const res = await fetch('/api/benchmarks');
@@ -561,6 +547,7 @@ async function loadBenchmarks() {
     }
 }
 
+// filter benchmark table rows by task and family
 function filterBenchmarks() {
     if (!cachedRegistryData) return;
 
@@ -581,7 +568,7 @@ function filterBenchmarks() {
     if (binarySubhead) binarySubhead.textContent = DATASET_INFO[selectedDs].binarySubheading;
     if (multiSubhead) multiSubhead.textContent = DATASET_INFO[selectedDs].multiclassSubheading;
 
-    // Show/hide sections
+    // toggle table sections
     if (binarySection) {
         binarySection.style.display = (taskFilter === 'all' || taskFilter === 'binary') ? 'block' : 'none';
     }
@@ -605,7 +592,7 @@ function filterBenchmarks() {
         }
     }
 
-    // Populate Binary Table
+    // populate binary table rows
     if (binaryTable && dsData.binary) {
         binaryTable.innerHTML = '';
         Object.keys(dsData.binary).forEach(fam => {
@@ -629,7 +616,7 @@ function filterBenchmarks() {
         });
     }
 
-    // Populate Multiclass Table
+    // populate multiclass table rows
     if (multiclassTable && dsData.multiclass) {
         multiclassTable.innerHTML = '';
         Object.keys(dsData.multiclass).forEach(fam => {
@@ -651,9 +638,7 @@ function filterBenchmarks() {
     }
 }
 
-// ==========================================
-// 8. Benchmark Charts
-// ==========================================
+// render benchmark comparison bar charts
 function renderComparisonCharts() {
     if (!cachedRegistryData) return;
 
@@ -678,7 +663,7 @@ function renderComparisonCharts() {
         multiCard.style.display = (selectedDs === 'cifake') ? 'none' : 'block';
     }
 
-    // Gather and sort binary models by accuracy
+    // render binary accuracy bars
     const binList = Object.values(dsData.binary || {}).map(m => ({
         name: m.family + (m.is_champion ? ' (Champ)' : ''),
         val: m.val_accuracy * 100,
@@ -702,7 +687,7 @@ function renderComparisonCharts() {
         });
     }
 
-    // Gather and sort multiclass models by accuracy
+    // render multiclass accuracy bars
     const multiList = Object.values(dsData.multiclass || {}).map(m => ({
         name: m.family + (m.is_champion ? ' (Champ)' : ''),
         val: m.val_accuracy * 100,
@@ -727,11 +712,9 @@ function renderComparisonCharts() {
     }
 }
 
-// ==========================================
-// 9. DOM Initialization & Event Listeners
-// ==========================================
+// initialize page events and initial data load
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Dropzone & File Input
+    // bind drag and drop listeners
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
 
@@ -767,7 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. Initial health check & benchmarks load
+    // run health check and load benchmarks
     checkEngineHealth();
     loadBenchmarks();
 });
