@@ -1,5 +1,5 @@
 # FakeLens — Multi-Domain Image Forgery Detection & Attribution Platform
-# Main execution CLI entry point for training, evaluation, preprocessing, and server execution
+# Main execution for the CLI entry point for training, evaluation, preprocessing, and server execution
 
 import os
 import sys
