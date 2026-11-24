@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# verify environment and project directory layout
+# to verify environment and project directory layout
 
 import sys
 from pathlib import Path
@@ -36,7 +36,7 @@ CORE_MODULES = [
 ]
 
 
-# check python version meets minimum requirement
+# to check python version meets minimum requirement
 def check_python_version() -> bool:
     print(f"[1/4] Checking Python version... Current: {sys.version.split()[0]}")
     if sys.version_info < (3, 10):
@@ -46,7 +46,7 @@ def check_python_version() -> bool:
     return True
 
 
-# check required folders exist
+# to check required folders exist
 def check_directories() -> bool:
     print("\n[2/4] Verifying project directory layout...")
     root = Path(__file__).resolve().parent.parent
@@ -61,7 +61,7 @@ def check_directories() -> bool:
     return all_present
 
 
-# test imports for essential libraries
+# to test imports for essential libraries
 def check_package_imports() -> dict:
     print("\n[3/4] Checking availability of ML and project libraries...")
     installed = {}
@@ -77,7 +77,7 @@ def check_package_imports() -> dict:
     return installed
 
 
-# check cuda gpu availability
+# to check cuda gpu availability
 def check_accelerator() -> None:
     print("\n[4/4] Checking compute accelerator availability...")
     try:
@@ -91,7 +91,7 @@ def check_accelerator() -> None:
         print("  [SKIP] PyTorch not yet installed.")
 
 
-# run all verification checks
+# to run all verification checks
 def main():
     print("=" * 60)
     print("  FakeLens Project Setup & Environment Verification")

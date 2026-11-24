@@ -20,7 +20,7 @@ from configs.config import (
 from src.data_loader import get_traditional_ml_data
 from src.validation import set_seed
 
-#train the knn classifier using image features reduced through pca
+# to train knn classifier on pca features
 def train_knn_baseline(
     pca_components: int = 100,
     train_subset_size: int = 20000,

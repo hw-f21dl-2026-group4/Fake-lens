@@ -5,7 +5,7 @@ import torch.nn as nn
 import torchvision.models as models
 from torchvision.models import efficientnet_b0, EfficientNet_B0_Weights
 
-#create an EfficientNet-B0 model with a custom classification head for transfer learning    
+# to build efficientnet-b0 with classification head
 def create_efficientnet_b0(num_classes: int = 2, pretrained: bool = True, dropout: float = 0.2) -> nn.Module:
     weights = EfficientNet_B0_Weights.DEFAULT if pretrained else None
     model = efficientnet_b0(weights=weights)
@@ -17,6 +17,7 @@ def create_efficientnet_b0(num_classes: int = 2, pretrained: bool = True, dropou
     return model
 
 
+# to train efficientnet-b0 transfer model
 def train_efficientnet_b0(dataset: str, task: str, epochs: int = 20, batch_size: int = 32, lr: float = 1e-4, dry_run: bool = False):
     num_classes = 2 if task == "binary" else (4 if dataset.lower() == "deepfakeface" else 5)
     print(f"[EfficientNet-B0 Training] Initializing {dataset.upper()} | {task.upper()} | {num_classes} Classes")

@@ -18,7 +18,7 @@ from src.data_loader import get_pytorch_dataloaders
 from src.validation import set_seed
 
 
-#train the baseline mlp using flattend cifake image pixels
+# to train baseline mlp on flattened pixels
 def train_mlp_baseline(
     max_epochs: int = 20,
     batch_size: int = 128,
@@ -61,7 +61,7 @@ def train_mlp_baseline(
     for epoch in range(1, max_epochs + 1):
         epoch_start = time.time()
 
-        # --- Training Phase ---
+        # training loop
         model.train()
         train_loss_sum = 0.0
         train_correct = 0
@@ -85,7 +85,7 @@ def train_mlp_baseline(
         train_loss = train_loss_sum / train_total
         train_acc = train_correct / train_total
 
-        # --- Validation Phase ---
+        # validation loop
         model.eval()
         val_loss_sum = 0.0
         val_correct = 0
@@ -128,7 +128,7 @@ def train_mlp_baseline(
             "epoch_time_sec": round(epoch_time, 2),
         })
 
-        # Save Best Validation Checkpoint
+        # save best validation checkpoint
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             best_val_acc = val_acc

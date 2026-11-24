@@ -6,7 +6,7 @@ import sys
 import argparse
 
 
-# Parse command-line arguments and route subcommands
+# to parse command-line arguments and route subcommands
 def main():
     parser = argparse.ArgumentParser(
         description="FakeLens: Multi-Domain AI Image Forgery Detection & Attribution",

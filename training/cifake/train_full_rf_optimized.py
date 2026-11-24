@@ -15,7 +15,7 @@ from configs.config import MODELS_DIR, RANDOM_SEED
 from src.data_loader import get_traditional_ml_data
 from src.experiment_tracker import log_experiment
 
-#train the optimized random forest using the full available training set
+# to train optimized random forest on full dataset
 def main():
     print("=" * 80)
     print("TRAINING FULL 79,707 REGULARIZED RANDOM FOREST (PHASE 3 OPTIMIZED)")

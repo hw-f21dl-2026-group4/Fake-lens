@@ -1,7 +1,7 @@
 import argparse
 from sklearn.neighbors import KNeighborsClassifier
 
-#Reterive the knn settings recorded from previous experiments
+# to get recorded knn parameters
 def get_historical_knn_params(dataset: str, task: str) -> dict:
     ds = dataset.lower()
     t = task.lower()
@@ -37,12 +37,13 @@ def get_historical_knn_params(dataset: str, task: str) -> dict:
             }
 
 
+# to initialize knn model
 def create_knn_model(dataset: str = "artifact", task: str = "binary", **kwargs) -> KNeighborsClassifier:
     params = get_historical_knn_params(dataset, task)
     params.update(kwargs)
     return KNeighborsClassifier(**params)
 
-#Initialize the knn model with the selected expermienetal configuration
+# to train knn on forensic features
 def train_knn(dataset: str, task: str, dry_run: bool = False, **kwargs):
     params = get_historical_knn_params(dataset, task)
     params.update(kwargs)

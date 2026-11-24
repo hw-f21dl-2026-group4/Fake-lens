@@ -1,4 +1,4 @@
-# tests for conditional source attribution logic
+# to test conditional source attribution logic
 
 import unittest
 import io
@@ -8,18 +8,18 @@ from PIL import Image
 from backend.api.inference_engine import engine
 
 
-# test conditional branching based on binary output
+# to test conditional branching based on binary output
 class TestConditionalInference(unittest.TestCase):
 
-    # set up inference engine
+    # to set up inference engine
     def setUp(self):
         self.engine = engine
 
-    # check engine loads successfully
+    # to check engine loads successfully
     def test_01_engine_ready(self):
         self.assertTrue(self.engine.is_ready)
 
-    # ensure real images skip multiclass attribution
+    # to ensure real images skip multiclass attribution
     def test_02_real_branch_skips_multiclass(self):
         img_real = Image.new("RGB", (224, 224), color=(200, 150, 120))
         buf = io.BytesIO()
@@ -32,7 +32,7 @@ class TestConditionalInference(unittest.TestCase):
             self.assertFalse(res["multiclass_result"]["executed"])
             self.assertIn("bypassed", res["multiclass_result"]["reason"].lower())
 
-    # ensure fake images trigger multiclass attribution
+    # to ensure fake images trigger multiclass attribution
     def test_03_fake_branch_runs_multiclass(self):
         np.random.seed(42)
         fake_arr = np.random.randint(0, 256, (224, 224, 3), dtype=np.uint8)

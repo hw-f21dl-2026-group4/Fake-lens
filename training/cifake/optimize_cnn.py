@@ -19,6 +19,7 @@ from src.data_loader import get_pytorch_dataloaders
 from src.experiment_tracker import log_experiment
 from src.validation import set_seed
 
+# to train single cnn trial
 def train_single_cnn_trial(
     trial_cfg: Dict[str, Any],
     device,
@@ -102,7 +103,7 @@ def train_single_cnn_trial(
         train_loss = train_loss_sum / train_total
         train_acc = train_correct / train_total
 
-        # Validation
+        # run validation loop
         model.eval()
         val_loss_sum = 0.0
         val_preds = []
@@ -179,7 +180,7 @@ def train_single_cnn_trial(
 
     print(f"Trial {exp_id} Complete -> Best Epoch: {best_epoch} | Best Val Acc: {best_val_acc*100:.2f}% | Val F1: {best_metrics['val_f1']:.4f} | Total Time: {total_time:.1f}s")
 
-    # Log trial
+    # log trial results
     log_experiment({
         "Model": "CNN",
         "Experiment_ID": exp_id,
@@ -212,7 +213,7 @@ def train_single_cnn_trial(
     }
 
 
-# Run grid evaluation across CNN architectural hyperparameters
+# to run grid evaluation across cnn architectural hyperparameters
 def run_cnn_optimization():
     print("=" * 80)
     print("PHASE 3: CNN CONTROLLED OPTIMIZATION EXPERIMENTS")
@@ -289,7 +290,7 @@ def run_cnn_optimization():
         all_trial_summaries.append(res)
         val_acc = res["best_metrics"]["val_accuracy"]
 
-        # Checkpoint per trial
+        # save trial checkpoint
         MODELS_DIR.mkdir(parents=True, exist_ok=True)
         trial_ckpt = MODELS_DIR / f"cnn_{res['exp_id']}.pt"
         torch.save({

@@ -4,7 +4,7 @@ from PIL import Image
 from backend.features.extractors_v3 import extract_full_combined_features
 from backend.preprocessing.image_transforms import load_image_array
 
-#convert image charteristics into a numerical feature
+# to extract combined features from image
 def extract_features_from_image(img_input: Image.Image | str | Path) -> np.ndarray:
     if isinstance(img_input, (str, Path)):
         img_arr = load_image_array(img_input, target_size=(224, 224))
@@ -18,7 +18,7 @@ def extract_features_from_image(img_input: Image.Image | str | Path) -> np.ndarr
     assert len(feats) == 1798, f"Expected 1798 features, got {len(feats)}"
     return feats.astype(np.float32)
 
-#return the names of the features group used during image analysis.
+# to get feature group names
 def get_feature_group_names() -> list[str]:
     return [
         "Color Histograms (96 dims)",

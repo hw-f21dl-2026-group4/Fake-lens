@@ -18,7 +18,7 @@ from src.data_loader import get_pytorch_dataloaders
 from src.experiment_tracker import log_experiment
 from src.validation import set_seed
 
-#train one mlp configuration and record iots perfomarnce
+# to train single mlp trial
 def train_single_mlp_trial(
     trial_cfg: Dict[str, Any],
     train_loader,
@@ -36,7 +36,7 @@ def train_single_mlp_trial(
     process = psutil.Process(os.getpid())
     mem_baseline = process.memory_info().rss / (1024 * 1024)
 
-    # Instantiate model
+    # instantiate model architecture
     arch_type = trial_cfg["arch"]
     dropout = trial_cfg.get("dropout", 0.3)
     if arch_type == "A":
@@ -98,7 +98,7 @@ def train_single_mlp_trial(
         train_loss = train_loss_sum / train_total
         train_acc = train_correct / train_total
 
-        # Validation
+        # run validation loop
         model.eval()
         val_loss_sum = 0.0
         val_preds = []
@@ -205,7 +205,7 @@ def train_single_mlp_trial(
     }
 
 
-# Execute hyperparameter search for multilayer perceptron
+# to execute hyperparameter search for mlp
 def run_mlp_optimization():
     print("=" * 80)
     print("PHASE 3: MLP CONTROLLED OPTIMIZATION EXPERIMENTS")

@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+# to build 3-block convolutional neural network for cifake
 class CIFAKECNN(nn.Module):
     def __init__(self, dropout_rate: float = 0.4):
         super(CIFAKECNN, self).__init__()
@@ -37,6 +38,7 @@ class CIFAKECNN(nn.Module):
         return logits.squeeze(-1)
 
 
+# to build multi-layer perceptron for flattened cifake pixels
 class CIFAKEMLP(nn.Module):
     def __init__(self, input_dim: int = 3072):
         super(CIFAKEMLP, self).__init__()

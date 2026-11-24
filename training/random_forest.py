@@ -1,7 +1,7 @@
 import argparse
 from sklearn.ensemble import RandomForestClassifier
 
-#select the random forest settings recorded for the given dataset and task
+# to get recorded random forest parameters
 def get_historical_rf_params(dataset: str, task: str) -> dict:
     ds = dataset.lower()
     t = task.lower()
@@ -30,13 +30,14 @@ def get_historical_rf_params(dataset: str, task: str) -> dict:
                 "random_state": 42,
                 "n_jobs": -1
             }
-#build the random forest classifier using trhe slected settings.
+# to initialize random forest model
 def create_rf_model(dataset: str = "artifact", task: str = "binary", **kwargs) -> RandomForestClassifier:
     params = get_historical_rf_params(dataset, task)
     params.update(kwargs)
     return RandomForestClassifier(**params)
 
 
+# to train random forest on forensic features
 def train_random_forest(dataset: str, task: str, dry_run: bool = False, **kwargs):
     params = get_historical_rf_params(dataset, task)
     params.update(kwargs)

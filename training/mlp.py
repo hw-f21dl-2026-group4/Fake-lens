@@ -1,6 +1,7 @@
 import argparse
 from sklearn.neural_network import MLPClassifier
 
+# to get recorded mlp parameters
 def get_historical_mlp_params(dataset: str, task: str) -> dict:
     ds = dataset.lower()
     t = task.lower()
@@ -40,12 +41,14 @@ def get_historical_mlp_params(dataset: str, task: str) -> dict:
         }
 
 
+# to initialize mlp model
 def create_mlp_model(dataset: str = "artifact", task: str = "binary", **kwargs) -> MLPClassifier:
     params = get_historical_mlp_params(dataset, task)
     params.update(kwargs)
     return MLPClassifier(**params)
 
 
+# to train mlp on forensic features
 def train_mlp(dataset: str, task: str, dry_run: bool = False, **kwargs):
     params = get_historical_mlp_params(dataset, task)
     params.update(kwargs)

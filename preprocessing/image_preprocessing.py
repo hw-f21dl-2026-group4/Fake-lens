@@ -12,7 +12,7 @@ except ImportError:
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
 
-#read the image and convert it to RGB format
+# to load image and convert to rgb
 def load_image_rgb(path: str | Path, target_size=(224, 224)) -> Image.Image:
     """Safely loads an image from disk, converts to 3-channel RGB, and resizes using bilinear interpolation."""
     img = Image.open(path).convert("RGB")
@@ -20,12 +20,12 @@ def load_image_rgb(path: str | Path, target_size=(224, 224)) -> Image.Image:
         img = img.resize(target_size, Image.Resampling.BILINEAR)
     return img
 
-#represent the image as pixel values
+# to load image as numpy array
 def load_image_array(path: str | Path, target_size=(224, 224)) -> np.ndarray:
     img = load_image_rgb(path, target_size=target_size)
     return np.array(img, dtype=np.uint8)
 
-#choose the required image transformation based on the dataset
+# to get image transforms for dataset and task
 def get_image_transforms(dataset: str = "deepfakeface", model_family: str = "efficientnet_b0", split: str = "val"):
     if not TORCH_AVAILABLE:
         raise RuntimeError("torch and torchvision are required for image transforms.")
@@ -48,7 +48,7 @@ def get_image_transforms(dataset: str = "deepfakeface", model_family: str = "eff
 
     return transforms.Compose(transform_list)
 
-#prepare a single image for predecition by converting in to a tensor
+# to preprocess image for inference
 def preprocess_image_for_inference(img: Image.Image | str | Path, model_family: str = "efficientnet_b0") -> "torch.Tensor":
     if not isinstance(img, Image.Image):
         img = load_image_rgb(img, target_size=(224, 224))
