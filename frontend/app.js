@@ -59,7 +59,7 @@ const DATASET_INFO = {
     }
 };
 
-// handle dataset change from comparison tab
+// handles the dataset change from comparison tab
 function onCompDatasetChange(ds) {
     if (ds && ds !== currentDataset) {
         switchGlobalDataset(ds);
@@ -106,13 +106,13 @@ function switchGlobalDataset(ds) {
     if (btnArt) btnArt.classList.toggle('active', ds === 'artifact');
     if (btnCif) btnCif.classList.toggle('active', ds === 'cifake');
 
-    // update compact selector
+    // updates compact selector
     const compactSelect = document.getElementById('datasetCompactSelect');
     if (compactSelect && compactSelect.value !== ds) {
         compactSelect.value = ds;
     }
 
-    // update banner and ui text
+    // updates banner and ui text
     const info = DATASET_INFO[ds];
     const domainBadgeActive = document.getElementById('domainBadgeActive');
     const domainDescription = document.getElementById('domainDescription');
@@ -138,7 +138,7 @@ function switchGlobalDataset(ds) {
     if (domainSuitabilityText) domainSuitabilityText.innerHTML = info.suitability;
     if (compDatasetSelect) compDatasetSelect.value = ds;
 
-    // update model selector options for dataset
+    // updates model selector options for dataset
     const modelFamilySelect = document.getElementById('modelFamilySelect');
     if (modelFamilySelect) {
         const prevFam = modelFamilySelect.value;
@@ -171,7 +171,7 @@ function switchGlobalDataset(ds) {
         onModelFamilyChange();
     }
 
-    // reset previous inference display
+    // resets the previous inference display
     const resultsWrapper = document.getElementById('resultsWrapper');
     const disagreementBanner = document.getElementById('disagreementBanner');
     if (resultsWrapper) resultsWrapper.classList.remove('active');
@@ -182,7 +182,7 @@ function switchGlobalDataset(ds) {
     renderComparisonCharts();
 }
 
-// verify server health and model count
+// verifies the server health and model count
 async function checkEngineHealth() {
     const pill = document.getElementById('engineStatusPill');
     const statusText = document.getElementById('engineStatusText');
