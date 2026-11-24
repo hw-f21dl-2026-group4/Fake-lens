@@ -15,7 +15,7 @@ from urllib.parse import urlparse, parse_qs
 
 _engine_instance = None
 
-#get the inference engine required to process predicition request
+#gets the inference engine required to process predicition request
 def get_engine():
     global _engine_instance
     if _engine_instance is None:
@@ -33,12 +33,12 @@ try:
 except Exception:
     MODEL_REGISTRY = {}
 
-#allow the server to handle more than one request at a time
+#allows the server to handle more than one request at a time
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Handle requests concurrently in separate threads."""
     daemon_threads = True
 
-#handle request coming from the frontend and send suitable responses
+#handles the request coming from the frontend and send suitable responses
 class FakeLensRequestHandler(SimpleHTTPRequestHandler):
     """
     HTTP handler serving API endpoints and frontend assets.
@@ -46,7 +46,7 @@ class FakeLensRequestHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=FRONTEND_DIR, **kwargs)
 
-    # Set the response headders
+    # Sets the response headers
     def _set_json_headers(self, status=HTTPStatus.OK):
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -55,11 +55,11 @@ class FakeLensRequestHandler(SimpleHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
-    # Handle browser preflight request before actual api request
+    # Handles the browser preflight request before actual api request
     def do_OPTIONS(self):
         self._set_json_headers(HTTPStatus.NO_CONTENT)
 
-    # handle request for model information, evaluation and other resiurces.
+    # Handles the request for model information, evaluation and other resiurces.
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
@@ -114,7 +114,7 @@ class FakeLensRequestHandler(SimpleHTTPRequestHandler):
 
         return super().do_GET()
 
-    # receive the uploaded image
+    # receives the uploaded image
     def do_POST(self):
         parsed = urlparse(self.path)
         path = parsed.path
@@ -190,7 +190,7 @@ class FakeLensRequestHandler(SimpleHTTPRequestHandler):
         self.wfile.write(json.dumps({"error": f"Endpoint not found: {path}"}).encode("utf-8"))
 
 
-# start the application server using the given host address and port
+# starts the application server using the given host address and port
 def run_server(port=PORT, bind="127.0.0.1"):
     server_address = (bind, port)
     httpd = ThreadedHTTPServer(server_address, FakeLensRequestHandler)
