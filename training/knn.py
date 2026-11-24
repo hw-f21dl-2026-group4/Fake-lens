@@ -37,7 +37,7 @@ def get_historical_knn_params(dataset: str, task: str) -> dict:
             }
 
 
-# to initialize knn model
+# to initialize the knn model
 def create_knn_model(dataset: str = "artifact", task: str = "binary", **kwargs) -> KNeighborsClassifier:
     params = get_historical_knn_params(dataset, task)
     params.update(kwargs)

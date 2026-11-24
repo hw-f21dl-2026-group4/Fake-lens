@@ -180,7 +180,7 @@ def train_single_cnn_trial(
 
     print(f"Trial {exp_id} Complete -> Best Epoch: {best_epoch} | Best Val Acc: {best_val_acc*100:.2f}% | Val F1: {best_metrics['val_f1']:.4f} | Total Time: {total_time:.1f}s")
 
-    # log trial results
+    # logs the trial results
     log_experiment({
         "Model": "CNN",
         "Experiment_ID": exp_id,
@@ -213,7 +213,7 @@ def train_single_cnn_trial(
     }
 
 
-# to run grid evaluation across cnn architectural hyperparameters
+# to run grid evaluations across cnn architectural hyperparameters
 def run_cnn_optimization():
     print("=" * 80)
     print("PHASE 3: CNN CONTROLLED OPTIMIZATION EXPERIMENTS")
@@ -290,7 +290,7 @@ def run_cnn_optimization():
         all_trial_summaries.append(res)
         val_acc = res["best_metrics"]["val_accuracy"]
 
-        # save trial checkpoint
+        # saves the trial checkpoint
         MODELS_DIR.mkdir(parents=True, exist_ok=True)
         trial_ckpt = MODELS_DIR / f"cnn_{res['exp_id']}.pt"
         torch.save({

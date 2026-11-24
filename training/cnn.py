@@ -14,7 +14,7 @@ def create_cnn_model(num_classes: int = 2, dropout: float = 0.3) -> nn.Module:
     return FakeLensSimpleCNN(num_classes=num_classes, dropout=dropout)
 
 
-# to train cnn on dataset
+# to train cnn on the dataset
 def train_cnn(dataset: str, task: str, epochs: int = 20, batch_size: int = 32, lr: float = 1e-3, dry_run: bool = False):
     num_classes = 2 if task == "binary" else (4 if dataset.lower() == "deepfakeface" else 5)
     print(f"[CNN Training] Initializing {dataset.upper()} | {task.upper()} | {num_classes} Classes")
