@@ -1,32 +1,3 @@
-"""
-Phase 5F: Versioned Extended Handcrafted Image-Forensic Feature Extractor.
-Preserves original extract_all_features() baseline (1,690 dims) and appends 108 forensic dims.
-Total extended dimension: 1,690 + 108 = 1,798 dimensions.
-
-Extended Groups:
-- Texture & Gradient Dynamics (24 dims):
-    * Multi-radius LBP (P=16, R=2.0 uniform -> 18 bins)
-    * Laplacian response variance & kurtosis (2 dims)
-    * Sobel gradient magnitude mean, std, skew, 95th-percentile (4 dims)
-- Frequency Energy Distribution (16 dims):
-    * Radial frequency ring energy (8 rings)
-    * Spectral anisotropy across 4 quadrants (4 dims)
-    * High-frequency to low-frequency energy ratios (4 dims)
-- Color & Channel Statistics (24 dims):
-    * RGB channel pairwise correlations (R-G, R-B, G-B -> 3 dims)
-    * HSV channel moments (mean, std for H, S, V -> 6 dims)
-    * YCrCb chrominance moments (mean, std, skew for Cr, Cb -> 6 dims)
-    * Global color contrast / saturation dynamics (9 dims)
-- Noise Residual & Edge Sharpness (20 dims):
-    * High-pass / Wiener noise residual variance & kurtosis (4 dims)
-    * Tenengrad gradient sharpness index (4 dims)
-    * Regional noise variance across 4 image quadrants (4 dims)
-    * High-frequency residual energy statistics (8 dims)
-- Spatial Consistency & Center-Periphery Asymmetry (24 dims):
-    * Center vs Peripheral face-region luminance & texture contrast (12 dims)
-    * Upper vs Lower face-region texture and color balance (12 dims)
-"""
-
 from pathlib import Path
 import numpy as np
 import cv2
@@ -38,10 +9,6 @@ from backend.features.extractors import extract_all_features
 
 
 def extract_texture_gradient_extended(img_rgb: np.ndarray) -> np.ndarray:
-    """
-    Computes multi-radius LBP (P=16, R=2) and spatial gradient statistics.
-    Returns: 18 (LBP) + 2 (Laplacian stats) + 4 (Sobel stats) = 24 dimensions.
-    """
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY)
 
     # 1. Multi-radius LBP (P=16, R=2.0 uniform -> 18 bins)
@@ -70,10 +37,6 @@ def extract_texture_gradient_extended(img_rgb: np.ndarray) -> np.ndarray:
 
 
 def extract_frequency_energy_extended(img_rgb: np.ndarray) -> np.ndarray:
-    """
-    Computes fine-grained radial spectral ratios and 2D quadrant anisotropy.
-    Returns: 8 (radial rings) + 4 (quadrant anisotropy) + 4 (energy ratios) = 16 dimensions.
-    """
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
     h, w = gray.shape
     cy, cx = h // 2, w // 2
@@ -124,10 +87,6 @@ def extract_frequency_energy_extended(img_rgb: np.ndarray) -> np.ndarray:
 
 
 def extract_color_extended(img_rgb: np.ndarray) -> np.ndarray:
-    """
-    Computes cross-channel correlation, HSV moments, and YCrCb chrominance statistics.
-    Returns: 3 (RGB corr) + 6 (HSV moments) + 6 (YCrCb moments) + 9 (color dynamics) = 24 dimensions.
-    """
     r = img_rgb[:, :, 0].ravel().astype(np.float32)
     g = img_rgb[:, :, 1].ravel().astype(np.float32)
     b = img_rgb[:, :, 2].ravel().astype(np.float32)
@@ -165,10 +124,6 @@ def extract_color_extended(img_rgb: np.ndarray) -> np.ndarray:
 
 
 def extract_noise_sharpness_extended(img_rgb: np.ndarray) -> np.ndarray:
-    """
-    Extracts high-frequency noise residual and local edge sharpness metrics.
-    Returns: 4 (noise residual stats) + 4 (Tenengrad sharpness) + 4 (quadrant noise) + 8 (residual spectrum) = 20 dimensions.
-    """
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
     h, w = gray.shape
 
@@ -220,11 +175,6 @@ def extract_noise_sharpness_extended(img_rgb: np.ndarray) -> np.ndarray:
 
 
 def extract_spatial_consistency_extended(img_rgb: np.ndarray) -> np.ndarray:
-    """
-    Computes spatial asymmetry: Center (face region) vs Peripheral (background)
-    and Upper (eyes/forehead) vs Lower (mouth/chin).
-    Returns: 12 (center-periphery) + 12 (upper-lower) = 24 dimensions.
-    """
     gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32)
     h, w = gray.shape
 
@@ -282,15 +232,6 @@ def extract_spatial_consistency_extended(img_rgb: np.ndarray) -> np.ndarray:
 
 
 def extract_extended_forensic_features(img_path_or_array: str | Path | np.ndarray) -> np.ndarray:
-    """
-    Extracts the 108 extended image-forensic features:
-    - Texture & Gradient (24)
-    - Frequency Energy (16)
-    - Color Dynamics (24)
-    - Noise & Sharpness (20)
-    - Spatial Consistency (24)
-    Total = 108 dimensions.
-    """
     if isinstance(img_path_or_array, (str, Path)):
         img_rgb = load_image_array(img_path_or_array, target_size=(224, 224))
     else:
@@ -307,10 +248,6 @@ def extract_extended_forensic_features(img_path_or_array: str | Path | np.ndarra
 
 
 def extract_full_combined_features(img_path_or_array: str | Path | np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Extracts both baseline (1,690) and extended (1,798) representations in a single image read.
-    Returns: (baseline_1690, extended_1798)
-    """
     if isinstance(img_path_or_array, (str, Path)):
         img_rgb = load_image_array(img_path_or_array, target_size=(224, 224))
     else:

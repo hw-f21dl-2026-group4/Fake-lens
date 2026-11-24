@@ -1,13 +1,3 @@
-"""
-PyTorch Dataset and DataLoaders for FakeLens CNN training and evaluation.
-Features:
-- Reads directly from manifest CSVs (train_manifest.csv, val_manifest.csv, test_manifest.csv).
-- Applies split-aware transforms (light augmentation for train, deterministic for val/test).
-- Preserves both binary_label (0=REAL, 1=FAKE) and source_class (for multiclass classification).
-- Configurable batch_size (defaults to 16 for RTX 3050 6GB VRAM).
-- Multiprocessing num_workers optimized for Windows (default 0 or 2).
-"""
-
 from pathlib import Path
 from typing import Optional, Tuple
 import pandas as pd
@@ -29,11 +19,9 @@ BINARY_LABEL_MAP = {"REAL": 0, "FAKE": 1}
 SOURCE_CLASS_MAP = {"wiki": 0, "text2img": 1, "inpainting": 2, "insight": 3}
 SOURCE_CLASS_NAMES = ["wiki", "text2img", "inpainting", "insight"]
 
-
+# create a custom dataset for loading deepfakeface images and their labels
 class DeepFakeFaceDataset(Dataset):
-    """
-    PyTorch Dataset for DeepFakeFace subset images.
-    """
+    #read the dataset manifest and prepare the selected dataset split
     def __init__(self, manifest_csv: str | Path, root_dir: str | Path = ".", split: str = "train", transform=None):
         if not TORCH_AVAILABLE:
             raise RuntimeError("PyTorch is required to instantiate DeepFakeFaceDataset.")
@@ -47,18 +35,18 @@ class DeepFakeFaceDataset(Dataset):
         else:
             self.transform = get_cnn_transforms(split=self.split)
 
+    #return the total number of samples available in the dataset 
     def __len__(self) -> int:
         return len(self.df)
 
+    #load one image alone with its corresponding dataset information
     def __getitem__(self, idx: int) -> dict:
         row = self.df.iloc[idx]
         img_rel_path = row["local_path"]
         full_path = self.root_dir / img_rel_path
 
-        # Load RGB PIL image
         img = load_image_rgb(full_path, target_size=None)
 
-        # Apply torchvision transform
         tensor_img = self.transform(img)
 
         binary_target = BINARY_LABEL_MAP[row["binary_label"]]
@@ -74,7 +62,7 @@ class DeepFakeFaceDataset(Dataset):
         }
 
 
-# Construct PyTorch DataLoader for image training and evaluation
+#create batches of images so the cnn can process them efficiently
 def get_cnn_dataloader(manifest_csv: str | Path,
                        root_dir: str | Path = ".",
                        split: str = "train",

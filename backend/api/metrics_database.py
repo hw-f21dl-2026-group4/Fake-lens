@@ -1,21 +1,8 @@
-"""
-Comprehensive Verified Metrics and Confusion Matrices Database for FakeLens.
-All data strictly extracted from verified saved validation reports:
-- V4 Models evaluated on V5 7K validation: results/phase10/v4_models_on_v5_validation/metrics/phase10a_cross_version_evaluation_metrics.json
-- V5 Models evaluated on V5 7K validation:
-    * Binary RF: results/phase7/binary_rf/calibration/reports/phase7b1_validation_comparison.json
-    * Binary MLP: results/phase7/binary_mlp/metadata/phase7c_final_evaluation_results.json
-    * Binary KNN: results/phase7/binary_knn/metadata/phase7d_final_evaluation_results.json
-    * Binary CNN: results/phase7/binary_cnn/metadata/phase7e_final_evaluation_results.json
-    * Multiclass RF: results/phase8/v5_multiclass_rf/metrics/v5_multiclass_rf_final_metrics.json
-    * Multiclass MLP: results/phase8/v5_multiclass_mlp/metrics/v5_multiclass_mlp_final_metrics.json
-    * Multiclass KNN: results/phase8/v5_multiclass_knn/metrics/v5_multiclass_knn_final_metrics.json
-    * Multiclass CNN: results/phase9/v5_multiclass_cnn_architecture/phase9d_epoch21_to25/metrics/final_official_validation_metrics.json
-"""
-
 import json
 
+#store previously recorded model evaluation results in one place
 VERIFIED_EVALUATION_DATABASE = {
+    #general information about the validation
     "benchmark_info": {
         "name": "DeepFakeFace V5 Official Validation Set",
         "sample_count": 7000,
@@ -25,6 +12,7 @@ VERIFIED_EVALUATION_DATABASE = {
         },
         "description": "Cross-version standardized evaluation performed across all 16 model/task configurations on identical unseen validation portraits."
     },
+    # evaluation result collected from the earlier v4 model
     "v4_models": {
         "binary": {
             "CNN": {
@@ -104,6 +92,7 @@ VERIFIED_EVALUATION_DATABASE = {
                 "is_champion": False
             }
         },
+        #result for model that identity the image generation category
         "multiclass": {
             "CNN": {
                 "family": "CNN",
