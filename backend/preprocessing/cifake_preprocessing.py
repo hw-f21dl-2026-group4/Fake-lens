@@ -1,12 +1,3 @@
-"""
-FakeLens Backend: CIFAKE Image Preprocessing & Feature Extraction
-Strictly reproduces the teammate training preprocessing pipelines:
-- CNN: 32x32 RGB -> ToTensor -> Normalize(mean, std)
-- MLP: 32x32 RGB -> ToTensor -> Normalize(mean, std) -> Flatten(3072)
-- Random Forest: 32x32 RGB -> Raw Pixels / 255.0 -> Flatten(3072)
-- KNN: 32x32 RGB -> Raw Pixels / 255.0 -> Flatten(3072) -> PCA 100-D
-"""
-
 import json
 import os
 from pathlib import Path
@@ -17,20 +8,17 @@ import torch
 import torchvision.transforms as T
 import joblib
 
-# Full-precision channel normalization statistics fitted on 79,707 decontaminated CIFAKE training images
 CIFAKE_CHANNEL_MEAN = [0.47187030446185585, 0.46298588696063175, 0.4182617484016478]
 CIFAKE_CHANNEL_STD = [0.23743835452750506, 0.23727779851417555, 0.2658298828347467]
 
-# Deterministic PyTorch evaluation transform for CNN and MLP
 CIFAKE_EVAL_TRANSFORM = T.Compose([
     T.ToTensor(),
     T.Normalize(mean=CIFAKE_CHANNEL_MEAN, std=CIFAKE_CHANNEL_STD)
 ])
 
-# Global cache for PCA model
 _PCA_100_CACHE = None
 
-# Fit or apply 100-component PCA dimensionality reduction
+#load the saved pca transformation used to reduce the number of features
 def get_pca_100():
     global _PCA_100_CACHE
     if _PCA_100_CACHE is None:
@@ -44,10 +32,7 @@ def get_pca_100():
 
 
 def preprocess_cifake_image(pil_img: Image.Image, model_family: str, device: torch.device = torch.device("cpu")):
-    """
-    Preprocess a PIL image for CIFAKE models.
-    Guarantees exact numerical equivalence with original teammate pipelines.
-    """
+
     img_rgb = pil_img.convert("RGB")
     if img_rgb.size != (32, 32):
         img_rgb = img_rgb.resize((32, 32), Image.BILINEAR)

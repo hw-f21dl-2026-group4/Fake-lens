@@ -1,17 +1,7 @@
-"""
-Random Forest Training Specification for FakeLens.
-Reconciles exact historical experimental configurations:
-- DeepFakeFace Binary: 150 trees, max_depth=None, min_samples_leaf=6
-- DeepFakeFace Multiclass: 250 trees, max_depth=28, min_samples_leaf=3
-- ArtiFact Binary (55K Champion): 250 trees, max_depth=None, min_samples_leaf=4
-- ArtiFact Multiclass (32K Champion): 250 trees, max_depth=None, min_samples_leaf=4
-"""
-
 import argparse
 from sklearn.ensemble import RandomForestClassifier
 
-
-# Retrieve verified optimal hyperparameters for Random Forest
+#select the random forest settings recorded for the given dataset and task
 def get_historical_rf_params(dataset: str, task: str) -> dict:
     ds = dataset.lower()
     t = task.lower()
@@ -23,7 +13,7 @@ def get_historical_rf_params(dataset: str, task: str) -> dict:
             "random_state": 42,
             "n_jobs": -1
         }
-    else:  # deepfakeface
+    else:  
         if t == "binary":
             return {
                 "n_estimators": 150,
@@ -40,17 +30,14 @@ def get_historical_rf_params(dataset: str, task: str) -> dict:
                 "random_state": 42,
                 "n_jobs": -1
             }
-
-
+#build the random forest classifier using trhe slected settings.
 def create_rf_model(dataset: str = "artifact", task: str = "binary", **kwargs) -> RandomForestClassifier:
-    """Builds configured RandomForestClassifier matching exact historical experiments."""
     params = get_historical_rf_params(dataset, task)
     params.update(kwargs)
     return RandomForestClassifier(**params)
 
 
 def train_random_forest(dataset: str, task: str, dry_run: bool = False, **kwargs):
-    """Consolidated Random Forest execution matching historical experiments."""
     params = get_historical_rf_params(dataset, task)
     params.update(kwargs)
     print(f"[Random Forest] Initializing {dataset.upper()} | {task.upper()} with params: {params}")

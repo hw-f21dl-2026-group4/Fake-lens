@@ -1,17 +1,7 @@
-"""
-K-Nearest Neighbors Training Specification for FakeLens.
-Reconciles exact historical experimental configurations:
-- DeepFakeFace Binary: k=21, uniform weighting, Euclidean
-- DeepFakeFace Multiclass: k=15, distance weighting, Cosine metric (with PCA)
-- ArtiFact Binary (32K/55K Champion): k=9, distance weighting, Euclidean
-- ArtiFact Multiclass (32K Champion): k=5, uniform weighting, Minkowski
-"""
-
 import argparse
 from sklearn.neighbors import KNeighborsClassifier
 
-
-# Retrieve verified optimal hyperparameters for KNN model
+#Reterive the knn settings recorded from previous experiments
 def get_historical_knn_params(dataset: str, task: str) -> dict:
     ds = dataset.lower()
     t = task.lower()
@@ -30,7 +20,7 @@ def get_historical_knn_params(dataset: str, task: str) -> dict:
                 "metric": "minkowski",
                 "n_jobs": -1
             }
-    else:  # deepfakeface
+    else:  
         if t == "binary":
             return {
                 "n_neighbors": 21,
@@ -48,14 +38,12 @@ def get_historical_knn_params(dataset: str, task: str) -> dict:
 
 
 def create_knn_model(dataset: str = "artifact", task: str = "binary", **kwargs) -> KNeighborsClassifier:
-    """Builds configured KNeighborsClassifier matching exact historical experiments."""
     params = get_historical_knn_params(dataset, task)
     params.update(kwargs)
     return KNeighborsClassifier(**params)
 
-
+#Initialize the knn model with the selected expermienetal configuration
 def train_knn(dataset: str, task: str, dry_run: bool = False, **kwargs):
-    """Consolidated KNN execution matching historical experiments."""
     params = get_historical_knn_params(dataset, task)
     params.update(kwargs)
     print(f"[KNN] Initializing {dataset.upper()} | {task.upper()} with params: {params}")

@@ -1,15 +1,3 @@
-"""
-CIFAKE Binary Image Classification Project
-Phase 3: MLP Controlled Optimization Pipeline
-Compares:
-1. Architecture A: 3072 -> 1024 -> 512 -> 128 -> 1 with AdamW + CosineAnnealingLR
-2. Architecture B: 3072 -> 2048 -> 1024 -> 256 -> 1 (Wider) with AdamW
-3. Architecture C: 3072 -> 1024 -> 512 -> 256 -> 64 -> 1 (Deeper) with AdamW
-4. Architecture A: Tuned lr=0.0005, weight_decay=1e-4, ReduceLROnPlateau
-Logs all trials into results/tables/phase3_experiments_log.csv
-Saves the top configuration to models/mlp_optimized_best.pt
-"""
-
 import sys
 import time
 import os
@@ -30,8 +18,7 @@ from src.data_loader import get_pytorch_dataloaders
 from src.experiment_tracker import log_experiment
 from src.validation import set_seed
 
-
-# Train single MLP candidate model configuration
+#train one mlp configuration and record iots perfomarnce
 def train_single_mlp_trial(
     trial_cfg: Dict[str, Any],
     train_loader,
@@ -187,8 +174,6 @@ def train_single_mlp_trial(
     peak_mem = round(max(0, mem_now - mem_baseline), 1)
 
     print(f"Trial {exp_id} Complete -> Best Epoch: {best_epoch} | Best Val Acc: {best_val_acc*100:.2f}% | Val F1: {best_metrics['val_f1']:.4f} | Total Time: {total_time:.1f}s")
-
-    # Log trial
     log_experiment({
         "Model": "MLP",
         "Experiment_ID": exp_id,
@@ -230,7 +215,6 @@ def run_mlp_optimization():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")
 
-    # Load DataLoaders with flattened RGB features (3072,)
     print("Loading PyTorch DataLoaders for MLP (Train: 79,707, Val: 19,619)...")
     train_loader, val_loader, _ = get_pytorch_dataloaders(
         batch_size=128,
@@ -239,7 +223,6 @@ def run_mlp_optimization():
     )
 
     trials = [
-        # Trial 1: Arch A + AdamW + Weight Decay (1e-4) + CosineAnnealingLR
         {
             "exp_id": "MLP_ArchA_AdamW_Cosine",
             "arch": "A",
@@ -250,7 +233,6 @@ def run_mlp_optimization():
             "scheduler": "cosine",
             "desc": "Arch A: 3072->1024->512->128 with AdamW + Cosine",
         },
-        # Trial 2: Arch B (Wider: 3072->2048->1024->256->1) + AdamW
         {
             "exp_id": "MLP_ArchB_Wider_AdamW",
             "arch": "B",
@@ -261,7 +243,6 @@ def run_mlp_optimization():
             "scheduler": "plateau",
             "desc": "Arch B: Wider 2048->1024->256 with AdamW + Plateau",
         },
-        # Trial 3: Arch C (Deeper: 3072->1024->512->256->64->1) + AdamW
         {
             "exp_id": "MLP_ArchC_Deeper_AdamW",
             "arch": "C",
@@ -272,7 +253,6 @@ def run_mlp_optimization():
             "scheduler": "cosine",
             "desc": "Arch C: Deeper 4-Layer Hierarchy with AdamW + Cosine",
         },
-        # Trial 4: Arch A with tuned lr=0.0005 + ReduceLROnPlateau
         {
             "exp_id": "MLP_ArchA_LR0005_Plateau",
             "arch": "A",
@@ -304,7 +284,6 @@ def run_mlp_optimization():
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             best_trial_result = res
-            # Save checkpoint
             MODELS_DIR.mkdir(parents=True, exist_ok=True)
             ckpt_path = MODELS_DIR / "mlp_optimized_best.pt"
             torch.save({
@@ -317,7 +296,6 @@ def run_mlp_optimization():
             }, ckpt_path)
             print(f"--> Saved new best MLP checkpoint (Val Acc: {best_val_acc*100:.2f}%) to {ckpt_path}")
 
-    # Save summary table of all MLP trials
     df_mlp_summary = pd.DataFrame([
         {
             "Experiment_ID": r["exp_id"],

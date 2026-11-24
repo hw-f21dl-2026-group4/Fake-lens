@@ -1,15 +1,3 @@
-"""
-CIFAKE Binary Image Classification Project
-Phase 3: CNN Controlled Optimization Pipeline
-Compares:
-1. CNN_3Block_AdamW_Cosine: 3-Block CNN with AdamW (lr=0.0005, wd=1e-4), CosineAnnealingLR, dropout=0.3, mild augmentation
-2. CNN_Residual_AdamW_Cosine: CIFAKEResNet with AdamW (lr=0.0005, wd=1e-4), CosineAnnealingLR, dropout=0.3, mild augmentation
-3. CNN_4Block_AdamW_Cosine: CIFAKECNN4Block with AdamW (lr=0.0005, wd=1e-4), CosineAnnealingLR, dropout=0.3, mild augmentation
-4. CNN_3Block_NoAug_LR0005: 3-Block CNN with No Data Augmentation, AdamW, lr=0.0005
-Logs all trials into results/tables/phase3_experiments_log.csv
-Trains the top architecture to convergence and saves models/cnn_optimized_best.pt
-"""
-
 import sys
 import time
 import os
@@ -31,8 +19,6 @@ from src.data_loader import get_pytorch_dataloaders
 from src.experiment_tracker import log_experiment
 from src.validation import set_seed
 
-
-# Train single CNN candidate model and track validation loss
 def train_single_cnn_trial(
     trial_cfg: Dict[str, Any],
     device,
@@ -48,7 +34,6 @@ def train_single_cnn_trial(
     process = psutil.Process(os.getpid())
     mem_baseline = process.memory_info().rss / (1024 * 1024)
 
-    # Load dataloaders
     augment = trial_cfg.get("augment", True)
     train_loader, val_loader, _ = get_pytorch_dataloaders(
         batch_size=BATCH_SIZE,
@@ -56,7 +41,6 @@ def train_single_cnn_trial(
         model_type="cnn",
     )
 
-    # Instantiate model
     arch_type = trial_cfg["arch"]
     dropout = trial_cfg.get("dropout", 0.3)
     if arch_type == "3block":
@@ -239,7 +223,7 @@ def run_cnn_optimization():
     print(f"Device: {device}")
 
     trials = [
-        # Trial 1: Baseline 3-Block architecture + AdamW + CosineAnnealingLR + lr=0.0005
+
         {
             "exp_id": "CNN_3Block_AdamW_Cosine",
             "arch": "3block",
@@ -251,7 +235,7 @@ def run_cnn_optimization():
             "augment": True,
             "desc": "3-Block CNN with AdamW + CosineAnnealingLR (lr=0.0005)",
         },
-        # Trial 2: Residual CNN (CIFAKEResNet) + AdamW + CosineAnnealingLR
+
         {
             "exp_id": "CNN_Residual_AdamW_Cosine",
             "arch": "residual",
@@ -263,7 +247,7 @@ def run_cnn_optimization():
             "augment": True,
             "desc": "CIFAKEResNet Residual Blocks with AdamW + Cosine",
         },
-        # Trial 3: 4-Block CNN (CIFAKECNN4Block)
+
         {
             "exp_id": "CNN_4Block_AdamW_Cosine",
             "arch": "4block",
@@ -275,7 +259,7 @@ def run_cnn_optimization():
             "augment": True,
             "desc": "4-Block CNN (32->64->128->256) with AdamW + Cosine",
         },
-        # Trial 4: 3-Block CNN No Augmentation comparison
+
         {
             "exp_id": "CNN_3Block_NoAug_LR0005",
             "arch": "3block",
@@ -325,7 +309,6 @@ def run_cnn_optimization():
     print(f"[STAGE 1 SELECTION] Superior Architecture: {best_trial_result['exp_id']} ({best_val_acc*100:.2f}% Val Acc)")
     print("=" * 75)
 
-    # Stage 2: Train the superior architecture for additional 6 epochs to reach full convergence
     top_cfg = best_trial_result["trial_cfg"].copy()
     top_cfg["exp_id"] = "CNN_Final_Optimized_Converged"
     top_cfg["desc"] = f"Converged Training of Superior Architecture ({best_trial_result['exp_id']})"
@@ -342,7 +325,6 @@ def run_cnn_optimization():
     final_best_res = converged_res if converged_res["best_metrics"]["val_accuracy"] >= best_val_acc else best_trial_result
     final_best_acc = final_best_res["best_metrics"]["val_accuracy"]
 
-    # Save final optimized checkpoint
     final_ckpt_path = MODELS_DIR / "cnn_optimized_best.pt"
     torch.save({
         "exp_id": final_best_res["exp_id"],
@@ -354,7 +336,6 @@ def run_cnn_optimization():
     }, final_ckpt_path)
     print(f"\n[FINAL OPTIMIZED CNN SAVED] {final_best_res['exp_id']} (Val Acc: {final_best_acc*100:.2f}%) -> {final_ckpt_path}")
 
-    # Save summary table of all CNN trials
     df_cnn_summary = pd.DataFrame([
         {
             "Experiment_ID": r["exp_id"],

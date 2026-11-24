@@ -1,8 +1,3 @@
-"""
-CIFAKE Binary Image Classification Project
-Step 4: MLP Baseline Training Pipeline
-"""
-
 import sys
 import time
 from pathlib import Path
@@ -12,7 +7,6 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm
 
-# Add project root to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from configs.config import (
     MODELS_DIR,
@@ -24,7 +18,7 @@ from src.data_loader import get_pytorch_dataloaders
 from src.validation import set_seed
 
 
-# Train baseline Multilayer Perceptron on flattened image pixels
+#train the baseline mlp using flattend cifake image pixels
 def train_mlp_baseline(
     max_epochs: int = 20,
     batch_size: int = 128,
@@ -39,7 +33,6 @@ def train_mlp_baseline(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Execution Device: {device} (PyTorch {torch.__version__})")
 
-    # Load DataLoaders with flattened RGB features (3072,)
     train_loader, val_loader, _ = get_pytorch_dataloaders(
         batch_size=batch_size,
         augment_train=False,  # Standard deterministic flattened features for MLP
@@ -163,7 +156,6 @@ def train_mlp_baseline(
     print(f"\nMLP Training Finished in {total_training_time:.1f}s.")
     print(f"Best Validation Epoch: {best_epoch} (Loss: {best_val_loss:.4f}, Acc: {best_val_acc*100:.2f}%)")
 
-    # Save training history
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
     df_history = pd.DataFrame(history)
     df_history.to_csv(TABLES_DIR / "mlp_training_history.csv", index=False)

@@ -1,8 +1,3 @@
-"""
-CIFAKE Binary Image Classification Project
-Phase 3: Train Optimized Regularized Random Forest on Full 79,707 Training Images
-"""
-
 import time
 import os
 import psutil
@@ -20,8 +15,7 @@ from configs.config import MODELS_DIR, RANDOM_SEED
 from src.data_loader import get_traditional_ml_data
 from src.experiment_tracker import log_experiment
 
-
-# Train optimized Random Forest ensemble on full training set
+#train the optimized random forest using the full available training set
 def main():
     print("=" * 80)
     print("TRAINING FULL 79,707 REGULARIZED RANDOM FOREST (PHASE 3 OPTIMIZED)")

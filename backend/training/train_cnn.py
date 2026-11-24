@@ -1,15 +1,3 @@
-"""
-Optimized PyTorch CNN Training Routine for FakeLens on CPU (AMD Ryzen 7 7840HS):
-- Uses 8 intraop CPU threads for optimal multi-threaded vector math.
-- Up to 5 epochs, batch_size=16.
-- Resumable checkpointing: saves cnn_checkpoint_latest.pt after every epoch (model, optimizer, scheduler, epoch, history).
-- Checkpoint selection based strictly on minimum validation loss (saved separately as cnn_best.pt).
-- Updates/appends results/cnn_training_history.csv after every epoch.
-- Auto-resumes from latest checkpoint if interrupted.
-- Evaluates best checkpoint once on held-out test split (1,200 images).
-- Generates test predictions, metrics, and per-generator breakdown.
-"""
-
 import os
 import sys
 import time
@@ -22,14 +10,12 @@ from torch.optim import Adam
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
-# Multi-threading optimization for CPU
 torch.set_num_threads(8)
 
 from backend.datasets.dff_dataset import get_cnn_dataloader
 from backend.models.cnn_model import FakeLensSimpleCNN
 
-
-# Execute single training epoch across batches with backpropagation
+#train the model for one complete pass through the training dataset
 def train_one_epoch(model, dataloader, criterion, optimizer, device):
     model.train()
     total_loss = 0.0
@@ -64,7 +50,7 @@ def train_one_epoch(model, dataloader, criterion, optimizer, device):
     return epoch_loss, epoch_acc, epoch_prec, epoch_rec, epoch_f1
 
 
-# Evaluate model loss and classification metrics on partition split
+#check the model performance on the selected dataset split
 def evaluate_split(model, dataloader, criterion, device):
     model.eval()
     total_loss = 0.0
@@ -102,8 +88,7 @@ def evaluate_split(model, dataloader, criterion, device):
         "targets": all_targets
     }
 
-
-# Run full iterative convolutional neural network training procedure
+#manage the complete cnn training process, including validation
 def train_cnn():
     print("=" * 65, flush=True)
     print(" FakeLens: Training Binary CNN (FakeLensSimpleCNN) on CPU", flush=True)
@@ -144,7 +129,6 @@ def train_cnn():
     history = []
     start_epoch = 1
 
-    # Check for resumable latest checkpoint
     if latest_checkpoint.exists():
         print(f"\n[!] Detected latest checkpoint at: {latest_checkpoint.name}", flush=True)
         try:
@@ -194,7 +178,6 @@ def train_cnn():
                 "val_f1": val_res["f1"]
             })
 
-            # Check if this is the best validation loss
             is_best = val_res["loss"] < best_val_loss
             if is_best:
                 best_val_loss = val_res["loss"]
@@ -206,7 +189,6 @@ def train_cnn():
                 }, best_checkpoint)
                 print(f"  [*] Validation loss improved to {best_val_loss:.4f} -> Saved best model to {best_checkpoint.name}", flush=True)
 
-            # Save resumable checkpoint after every epoch
             torch.save({
                 "epoch": epoch,
                 "model_state_dict": model.state_dict(),
@@ -217,14 +199,12 @@ def train_cnn():
             }, latest_checkpoint)
             print(f"  [+] Resumable state saved to {latest_checkpoint.name}", flush=True)
 
-            # Update history CSV on disk
             pd.DataFrame(history).to_csv(history_csv, index=False)
             print(f"  [+] Training history updated in {history_csv.name}", flush=True)
 
         total_training_time = time.time() - t0
         print(f"\nTraining finished in {total_training_time:.1f}s (~{total_training_time/60:.1f} mins).", flush=True)
-
-    # 3. Final Held-Out Test Evaluation of the selected Best Checkpoint
+        
     print("\n[3] Evaluating selected best checkpoint on Held-Out Test Split (1,200 images)...", flush=True)
     if not best_checkpoint.exists():
         print(f"Error: Best checkpoint {best_checkpoint} not found. Using current model state.", flush=True)
