@@ -18,7 +18,7 @@ CIFAKE_EVAL_TRANSFORM = T.Compose([
 
 _PCA_100_CACHE = None
 
-#load the saved pca transformation used to reduce the number of features
+#loads the saved pca transformations used to reduce the number of features
 def get_pca_100():
     global _PCA_100_CACHE
     if _PCA_100_CACHE is None:
