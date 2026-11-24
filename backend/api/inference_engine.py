@@ -31,9 +31,9 @@ INFERENCE_TRANSFORMS = transforms.Compose([
 ])
 
 
-# keep all model loading and image prediction operation in one place
+# keeps all of the models loading and image prediction operations in one place
 class UnifiedInferenceEngine:
-    # set up the initial resources needed by the prediction engine
+    # It sets up the initial resources needed by the prediction engine
     def __init__(self):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.registry = MODEL_REGISTRY
@@ -42,11 +42,11 @@ class UnifiedInferenceEngine:
         self.is_ready = True
         print(f"[FakeLens Engine] Initialized Unified Inference Engine on device: {self.device}")
 
-    #create a unique key using the dataset, task, and model family
+    #Creates a unique key using the dataset, task, and model family
     def _get_model_key(self, dataset: str, task: str, family: str) -> str:
         return f"{dataset.lower()}_{task.lower()}_{family.lower()}"
 
-    #get details of selected model from the registry
+    #gets the details of selected model from the registry
     def get_model_info(self, dataset: str, task: str, family: str) -> Dict[str, Any]:
         ds_key = dataset.lower()
         task_key = task.lower()
@@ -61,7 +61,7 @@ class UnifiedInferenceEngine:
 
         return self.registry[ds_key][task_key][fam_key]
 
-    # load the required trained model
+    # loads the required trained model
     def _load_model(self, dataset: str, task: str, family: str):
         key = self._get_model_key(dataset, task, family)
         if key in self.models_cache:
@@ -147,7 +147,7 @@ class UnifiedInferenceEngine:
         self.models_cache[key] = loaded_obj
         return loaded_obj
 
-    #convert the input image into 1798 numerical features
+    #converts the input image into 1798 numerical features
     def extract_image_features_1798(self, pil_img: Image.Image) -> np.ndarray:
         rgb_arr = np.array(pil_img.convert("RGB"))
         if rgb_arr.shape[0] != 224 or rgb_arr.shape[1] != 224:
@@ -160,7 +160,7 @@ class UnifiedInferenceEngine:
         vec_1798 = np.nan_to_num(vec_1798, nan=0.0, posinf=1.0, neginf=-1.0)
         return vec_1798.reshape(1, -1)
 
-    # get prediciton probabilities 
+    # gets the prediciton probabilities 
     def _predict_cifake_neural(self, model: nn.Module, tensor: torch.Tensor) -> List[float]:
         with torch.inference_mode():
             logit = model(tensor)
@@ -168,7 +168,7 @@ class UnifiedInferenceEngine:
             prob_real = 1.0 - prob_fake
             return [prob_real, prob_fake]
 
-    # pass the prepared image tensor through the neural network and get the class probabilities
+    # passes the prepared image tensor through the neural network and gets the class probabilities
     def _predict_neural(self, model: nn.Module, tensor: torch.Tensor) -> List[float]:
         with torch.inference_mode():
             logits = model(tensor)
@@ -178,7 +178,7 @@ class UnifiedInferenceEngine:
             return [float(p) for p in probs]
 
     def _predict_classical(self, raw_obj: Any, feat_vec: np.ndarray, model_type: str) -> List[float]:
-        # Handle dict wrappers
+        # Handles the dict wrappers
         if isinstance(raw_obj, dict):
             if "pipeline" in raw_obj:
                 probs = raw_obj["pipeline"].predict_proba(feat_vec)[0]
@@ -199,7 +199,7 @@ class UnifiedInferenceEngine:
 
         return [float(p) for p in probs]
 
-    #first check whether the image is real or fake
+    #first checks whether the image is real or fake
     def analyze_image(
         self,
         image_bytes: bytes,
@@ -414,7 +414,7 @@ class UnifiedInferenceEngine:
             "disclaimer": "AI predictions are probabilistic research estimates. FakeLens is an academic research prototype."
         }
 
-    # convert the uploaded image bytes into an image that engine can process
+    # converts the uploaded image bytes into an image that the engine can process
     def analyze_image_bytes(self, image_bytes: bytes, model_family: str = "CNN", dataset: str = "deepfakeface") -> Dict[str, Any]:
         return self.analyze_image(image_bytes, dataset=dataset, model_family=model_family)
 
