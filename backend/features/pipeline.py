@@ -12,7 +12,7 @@ from sklearn.impute import SimpleImputer
 from backend.features.extractors import extract_all_features
 from backend.datasets.dff_dataset import BINARY_LABEL_MAP, SOURCE_CLASS_MAP
 
-#Read the images listed in the dataset manifest and extract their features
+#Reads the images listed in the dataset manifest and extract their features
 def extract_split_features(manifest_csv: str | Path, root_dir: str | Path = ".", max_samples: int = None) -> Dict[str, Any]:
     root = Path(root_dir)
     df = pd.read_csv(manifest_csv)
@@ -45,7 +45,7 @@ def extract_split_features(manifest_csv: str | Path, root_dir: str | Path = ".",
         "image_ids": image_ids
     }
 
-# Fit the preprocessing pipeline using training features only.
+# Fits the preprocessing pipeline using training features only.
 def build_and_fit_scaler(X_train: np.ndarray, save_path: str | Path = None) -> Pipeline:
     pipeline = Pipeline([
         ("imputer", SimpleImputer(strategy="median")),
